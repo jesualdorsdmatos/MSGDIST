@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
-CND_ARTIFACT_NAME_Debug=tp_so
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/tp_so
+CND_ARTIFACT_NAME_Debug=msgdistso
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/msgdistso
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
-CND_PACKAGE_NAME_Debug=tpso.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/tpso.tar
+CND_PACKAGE_NAME_Debug=msgdistso.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/msgdistso.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
-CND_ARTIFACT_NAME_Release=tp_so
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/tp_so
+CND_ARTIFACT_NAME_Release=msgdistso
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/msgdistso
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
-CND_PACKAGE_NAME_Release=tpso.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/tpso.tar
+CND_PACKAGE_NAME_Release=msgdistso.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/msgdistso.tar
 #
 # include compiler specific variables
 #
