@@ -19,8 +19,7 @@
  */
 int main(int argc, char** argv) {
 
-    printf("teste!!!");
-    PRintf("javali!");
+  
     return (EXIT_SUCCESS);
 }
 

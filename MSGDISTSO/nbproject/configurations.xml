@@ -14,6 +14,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>cliente.c</itemPath>
       <itemPath>gestor.c</itemPath>
       <itemPath>main.c</itemPath>
     </logicalFolder>
@@ -39,6 +40,8 @@
       </toolsSet>
       <compileType>
       </compileType>
+      <item path="cliente.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="defines.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="gestor.c" ex="false" tool="0" flavor2="0">
@@ -68,6 +71,8 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="cliente.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="defines.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="gestor.c" ex="false" tool="0" flavor2="0">
