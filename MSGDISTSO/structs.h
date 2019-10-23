@@ -13,6 +13,13 @@ typedef struct msg_cli{
 } msg_cli;
 
 
+typedef struct variaveisamb{
+    
+    int MAXMSG;
+    int MAXNOT;
+    int WORDSNOT;
+    
+}varamb;
 
 #endif /* STRUCTS_H */
 
