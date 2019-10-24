@@ -9,7 +9,7 @@ typedef struct msg_cli{
     char topico[MAX_TOPIC];
     char titulo[MAX_TITULO];
     char corpo[MAX_CORPO];
-    int duracaO;
+    int duracao;
 } msg_cli;
 
 
@@ -17,7 +17,7 @@ typedef struct variaveisamb{
     
     int MAXMSG;
     int MAXNOT;
-    int WORDSNOT;
+    char *WORDSNOT;
     
 }varamb;
 

@@ -1,7 +1,4 @@
-/*
- 
- 
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,9 +7,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "structs.h"
-#define MAXMSG 10
-#define MAXNOT 10
-#define WORDSNOT "pal_bad.txt"
+#define MAXMSGD 10
+#define MAXNOTD 10
+#define WORSNOTD "pal_bad.txt"
 
 
 
@@ -30,7 +27,7 @@ int main(int argc, char *argv[]){
     //Máximo de mensagens
     if((getenv("MAXMSG"))==NULL){
          printf("MAXMSG default.\n");
-    var.MAXMSG=MAXMSG;
+    var.MAXMSG=MAXMSGD;
     }
      else   
          var.MAXMSG=atoi((getenv("MAXMSG")));
@@ -38,17 +35,17 @@ int main(int argc, char *argv[]){
      //Máximo número de palavras rejeitadas
     if((getenv("MAXNOT"))==NULL){
          printf("MAXNOT default.\n");
-    var.MAXNOT=MAXNOT;}
+    var.MAXNOT=MAXNOTD;}
      else   
          var.MAXNOT=atoi((getenv("MAXNOT")));
        
      //Nome da ficheiro com as palavras proíbidas
      if((getenv("WORDSNOT"))==NULL){
          printf("WORDSNOT default.\n");
-        var.WORDSNOT=atoi(WORDSNOT);
+        strcpy(var.WORDSNOT,WORSNOTD);
      }
      else   
-         var.WORDSNOT=atoi((getenv("WORDSNOT")));
+         strcpy(var.WORDSNOT,"WORDSNOT");
      
     char cmd[50];
     char pal[50];
