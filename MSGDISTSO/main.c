@@ -19,7 +19,7 @@
  */
 int main(int argc, char** argv) {
 
-printf("teste	\n");  
+  
     return (EXIT_SUCCESS);
 }
 

@@ -1,18 +1,10 @@
-/*
 
- */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
+#include "geraldefinc.h"
+#include "cliente_default.h"
 #include <ncurses.h>
 
-#define ENTER 10
-#define ESCAPE 27
-#define initx 14
-#define inity 6
+
 
 
 void iniciarcurses(){
