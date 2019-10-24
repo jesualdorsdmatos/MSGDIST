@@ -1,15 +1,5 @@
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include "structs.h"
-#define MAXMSGD 10
-#define MAXNOTD 10
-#define WORSNOTD "pal_bad.txt"
+#include "geraldefinc.h"
+#include "gestor_default.h"
 
 
 
