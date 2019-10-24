@@ -18,7 +18,6 @@
  * 
  */
 int main(int argc, char** argv) {
-    printf("Hello");
   
     return (EXIT_SUCCESS);
 }
