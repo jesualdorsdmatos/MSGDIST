@@ -7,6 +7,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
 
 #include "structs.h"
 
@@ -20,6 +24,7 @@ void encerrar(){
 int main(int argc, char *argv[]){
     varamb var;
     char *str;
+    int estado=0;
     // Processamento das variáveis de amabientes
     //Máximo de mensagens
     if((getenv("MAXMSG"))==NULL)
@@ -40,6 +45,7 @@ int main(int argc, char *argv[]){
          var.WORDSNOT=atoi((getenv("WORDSNOT")));
      
     char cmd[50];
+    char pal[50];
     
     while(1){
     printf("Intoduza um comando: ");
@@ -52,6 +58,13 @@ int main(int argc, char *argv[]){
     if (strcmp(cmd,"SHUTDOWN")==0){
        encerrar();
     }else if(strcmp(cmd,"FILTER")==0){
+         scanf("%s",pal);
+        
+         if(fork()==0){
+             execl("verificador","verificador",pal,NULL);
+             exit(1);
+         }
+         wait(NULL);
     
     }else if(strcmp(cmd,"USERS")==0){
     

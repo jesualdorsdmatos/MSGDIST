@@ -40,7 +40,7 @@ int checkWord(char * word, char wdef[][MAXWL], int maxw) {
 
 /* The main fuction. It's kind of useful to exist */
 int main(int argc, char** argv) {
-    char forbwords[MAXNW][MAXWL];
+    char forbwords[MAXNW][MAXWL];   
     char word[MAXWL];
     int numw;  /* number of words */
     int numhits;  /* hits in this message */
