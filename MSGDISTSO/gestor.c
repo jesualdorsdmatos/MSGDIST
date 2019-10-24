@@ -9,10 +9,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-
-
 #include "structs.h"
+#define MAXMSG 10
+#define MAXNOT 10
+#define WORDSNOT "pal_bad.txt"
+
 
 
 
@@ -27,20 +28,25 @@ int main(int argc, char *argv[]){
     int estado=0;
     // Processamento das variáveis de amabientes
     //Máximo de mensagens
-    if((getenv("MAXMSG"))==NULL)
-         printf("A variavel MAXMSG nao existe.\n");
+    if((getenv("MAXMSG"))==NULL){
+         printf("MAXMSG default.\n");
+    var.MAXMSG=MAXMSG;
+    }
      else   
          var.MAXMSG=atoi((getenv("MAXMSG")));
          
      //Máximo número de palavras rejeitadas
-    if((getenv("MAXNOT"))==NULL)
-         printf("A variavel MAXNOT nao existe.\n");
+    if((getenv("MAXNOT"))==NULL){
+         printf("MAXNOT default.\n");
+    var.MAXNOT=MAXNOT;}
      else   
          var.MAXNOT=atoi((getenv("MAXNOT")));
        
      //Nome da ficheiro com as palavras proíbidas
-     if((getenv("WORDSNOT"))==NULL)
-         printf("A variavel WORDSNOT nao existe.\n");
+     if((getenv("WORDSNOT"))==NULL){
+         printf("WORDSNOT default.\n");
+        var.WORDSNOT=atoi(WORDSNOT);
+     }
      else   
          var.WORDSNOT=atoi((getenv("WORDSNOT")));
      
