@@ -9,8 +9,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-
+#include <fcntl.h>
 
 #include "structs.h"
 
@@ -24,7 +23,7 @@ void encerrar(){
 int main(int argc, char *argv[]){
     varamb var;
     char *str;
-    int estado=0;
+    int estado=0, p[2];
     // Processamento das variáveis de amabientes
     //Máximo de mensagens
     if((getenv("MAXMSG"))==NULL)
@@ -39,32 +38,47 @@ int main(int argc, char *argv[]){
          var.MAXNOT=atoi((getenv("MAXNOT")));
        
      //Nome da ficheiro com as palavras proíbidas
-     if((getenv("WORDSNOT"))==NULL)
+         if((getenv("WORDSNOT"))==NULL)
          printf("A variavel WORDSNOT nao existe.\n");
      else   
          var.WORDSNOT=atoi((getenv("WORDSNOT")));
      
     char cmd[50];
     char pal[50];
-    
+    int i=0;
     while(1){
     printf("Intoduza um comando: ");
-    scanf("%s",cmd);
-            
+  scanf("%[^\n]" ,cmd); 
+   printf("%s\n",cmd);         
     for(int i =0; i<strlen(cmd);i++)
         cmd[i]= toupper(cmd[i]);
-    
+
 
     if (strcmp(cmd,"SHUTDOWN")==0){
        encerrar();
     }else if(strcmp(cmd,"FILTER")==0){
-         scanf("%s",pal);
-        
-         if(fork()==0){
-             execl("verificador","verificador",pal,NULL);
-             exit(1);
-         }
-         wait(NULL);
+              printf("%s",pal);
+         pipe(p);
+        if(fork()==0){
+                scanf("%[^\n]" ,pal); 
+
+         close(0);//Fecha o teclado
+         dup(p[0]);
+         close(p[0]);
+         close(p[1]);
+puts(pal);
+         execl("verificador","verificador","pal_bad.txt",NULL);
+         exit(1);
+      }
+        close (1);
+	dup(p[1]);
+	close(p[0]);
+	close (p[1]);
+	printf("%s\n",pal);
+    close(1);
+    wait(NULL);         
+     
+       
     
     }else if(strcmp(cmd,"USERS")==0){
     
