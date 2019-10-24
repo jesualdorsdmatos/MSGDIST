@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  
  
@@ -10,9 +11,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+=======
+#include "geraldefinc.h"
+#include "gestor_default.h"
 
-#include "structs.h"
 
+>>>>>>> 96ee919071a864840eeeb9dc27942eabbfb9bb4e
 
 
 
@@ -26,22 +30,28 @@ int main(int argc, char *argv[]){
     int estado=0, p[2];
     // Processamento das variáveis de amabientes
     //Máximo de mensagens
-    if((getenv("MAXMSG"))==NULL)
-         printf("A variavel MAXMSG nao existe.\n");
+    if((getenv("MAXMSG"))==NULL){
+         printf("MAXMSG default.\n");
+    var.MAXMSG=MAXMSGD;
+    }
      else   
          var.MAXMSG=atoi((getenv("MAXMSG")));
          
      //Máximo número de palavras rejeitadas
-    if((getenv("MAXNOT"))==NULL)
-         printf("A variavel MAXNOT nao existe.\n");
+    if((getenv("MAXNOT"))==NULL){
+         printf("MAXNOT default.\n");
+    var.MAXNOT=MAXNOTD;}
      else   
          var.MAXNOT=atoi((getenv("MAXNOT")));
        
      //Nome da ficheiro com as palavras proíbidas
-         if((getenv("WORDSNOT"))==NULL)
-         printf("A variavel WORDSNOT nao existe.\n");
+
+     if((getenv("WORDSNOT"))==NULL){
+         printf("WORDSNOT default.\n");
+        strcpy(var.WORDSNOT,WORSNOTD);
+     }
      else   
-         var.WORDSNOT=atoi((getenv("WORDSNOT")));
+         strcpy(var.WORDSNOT,"WORDSNOT");
      
     char cmd[50];
     char pal[50];
