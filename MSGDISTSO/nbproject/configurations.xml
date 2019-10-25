@@ -4,8 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>defines.h</itemPath>
-      <itemPath>structs.h</itemPath>
+      <itemPath>cliente_default.h</itemPath>
+      <itemPath>geraldefinc.h</itemPath>
+      <itemPath>gestor_default.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -42,13 +43,15 @@
       </compileType>
       <item path="cliente.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="defines.h" ex="false" tool="3" flavor2="0">
+      <item path="cliente_default.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="geraldefinc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="gestor.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="gestor_default.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="structs.h" ex="false" tool="3" flavor2="0">
+      <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -73,13 +76,15 @@
       </compileType>
       <item path="cliente.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="defines.h" ex="false" tool="3" flavor2="0">
+      <item path="cliente_default.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="geraldefinc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="gestor.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="gestor_default.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="structs.h" ex="false" tool="3" flavor2="0">
+      <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

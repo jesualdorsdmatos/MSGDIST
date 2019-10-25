@@ -7,7 +7,7 @@ typedef struct variaveisamb{
     
     int MAXMSG;
     int MAXNOT;
-    char *WORDSNOT;
+    char WORDSNOT[30];
     
 }varamb;
 

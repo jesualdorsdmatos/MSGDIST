@@ -29,4 +29,4 @@
 
 
 
-#endif /* MEDIT_DEFAULTS_H */
+#endif /* GERALDEFINC_H */

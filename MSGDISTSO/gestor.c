@@ -1,20 +1,22 @@
-#include "geraldefinc.h"
 #include "gestor_default.h"
+#include "geraldefinc.h"
 
 
-
-
-
-void encerrar(){
-    printf("O programa vai encerrar!\n");
-    exit(0);
+void removerespaco(char str[]) {
+    int j = 1;
+    for (int i = 1; str[i]; i++) {
+        if (str[i] != ' ' || (str[i - 1] != ' ')) {
+           str[j] = str[i];
+           j++;
+        }
+    }
+    str[j] = '\0';
 }
-int main(int argc, char *argv[]){
+
+
+
+varamb lervarambiente(){
     varamb var;
-    char *str;
-    int estado=0;
-    // Processamento das variáveis de amabientes
-    //Máximo de mensagens
     if((getenv("MAXMSG"))==NULL){
          printf("MAXMSG default.\n");
     var.MAXMSG=MAXMSGD;
@@ -33,17 +35,35 @@ int main(int argc, char *argv[]){
      if((getenv("WORDSNOT"))==NULL){
          printf("WORDSNOT default.\n");
         strcpy(var.WORDSNOT,WORSNOTD);
+        
      }
      else   
          strcpy(var.WORDSNOT,"WORDSNOT");
+    
+    return var;
+}
+
+void encerrar(){
+    printf("O programa vai encerrar!\n");
+    exit(0);
+}
+int main(int argc, char *argv){
+      char *str;
+    int estado=0;
+    
+    varamb var=lervarambiente();
+  
+   
      
-    char cmd[50];
-    char pal[50];
+   char cmd[50];
+   char pal[50];
     
     while(1){
     printf("Intoduza um comando: ");
-    scanf("%s",cmd);
-            
+    scanf(" %[^\n]",cmd);
+    removerespaco(cmd);
+    printf("%s\n",cmd);
+   
     for(int i =0; i<strlen(cmd);i++)
         cmd[i]= toupper(cmd[i]);
     
@@ -76,5 +96,6 @@ int main(int argc, char *argv[]){
     }
     //pause();
   }
+
 
 }
