@@ -11,5 +11,12 @@ typedef struct variaveisamb{
     
 }varamb;
 
+typedef struct cmdguardar{
+
+    char *comando;
+    char *argumento;
+
+}cmds;
+
 #endif /* GESTOR_DEFAULT_h */
 
