@@ -41,9 +41,17 @@ int main(int argc, char *argv[]){
     char pal[50];
     
     while(1){
+<<<<<<< HEAD
     printf("Intoduza um comando: ");
     scanf("%s",cmd);
             
+=======
+    printf("Intoduza um comando:");
+    scanf(" %[^\n]",cmd);
+    removerespaco(cmd);
+
+   
+>>>>>>> ramo_jesualdo
     for(int i =0; i<strlen(cmd);i++)
         cmd[i]= toupper(cmd[i]);
     
@@ -58,6 +66,24 @@ int main(int argc, char *argv[]){
              exit(1);
          }
          wait(NULL);
+<<<<<<< HEAD
+=======
+        }else if(strcmp(b.argumento,"OFF")==0){
+
+        }elsegit add *
+        git commit -m "comentário"
+        git push
+        git checkout master
+        git pull
+        git marge ramo_name
+        git commit -m "comentario"
+        git push
+        volto ao meu ramo
+        git marge master
+        git push
+            printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n",b.argumento);
+    }else if(strcmp(b.comando,"USERS")==0){
+>>>>>>> ramo_jesualdo
     
     }else if(strcmp(cmd,"USERS")==0){
     
