@@ -87,7 +87,7 @@ int main(int argc, char *argv){
         }else if(strcmp(b.argumento,"OFF")==0){
 
         }else
-            printf("[ERRO] Argumento:%s invalido\nArgumento:ON/OFF\n",b.argumento);
+            printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n",b.argumento);
     }else if(strcmp(b.comando,"USERS")==0){
     
     } else if(strcmp(b.comando,"TOPICS")==0){
