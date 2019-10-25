@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         printf("ERROR-1\n");
         return 1;
     }
-    wordsf = fopen(argv[1], "r");
+    wordsf = fopen(argv [1], "r");
     if (wordsf == NULL) {
         printf("ERROR-2\n");
         return 2;
