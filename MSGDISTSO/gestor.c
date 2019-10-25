@@ -61,7 +61,7 @@ int main(int argc, char *argv){
 
     
     while(1){
-    printf("Intoduza um comando: ");
+    printf("Intoduza um comando:");
     scanf(" %[^\n]",cmd);
     removerespaco(cmd);
 
@@ -86,7 +86,17 @@ int main(int argc, char *argv){
          wait(NULL);
         }else if(strcmp(b.argumento,"OFF")==0){
 
-        }else
+        }elsegit add *
+        git commit -m "comentário"
+        git push
+        git checkout master
+        git pull
+        git marge ramo_name
+        git commit -m "comentario"
+        git push
+        volto ao meu ramo
+        git marge master
+        git push
             printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n",b.argumento);
     }else if(strcmp(b.comando,"USERS")==0){
     
