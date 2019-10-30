@@ -19,4 +19,3 @@ typedef struct cmdguardar{
 }cmds;
 
 #endif /* GESTOR_DEFAULT_h */
-
