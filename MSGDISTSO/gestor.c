@@ -65,8 +65,7 @@ int main(int argc, char *argv){
         cmd[i]= toupper(cmd[i]);
 
         b.comando=strtok(cmd," ");
-        b.argumento=strtok(NULL, " ");
-
+        b.argumento=strtok(NULL, " ");-
 
     if (strcmp(b.comando,"SHUTDOWN")==0){
        encerrar();
@@ -84,6 +83,7 @@ int main(int argc, char *argv){
              //p[0]-lado de escrita do pipe;
              //p[1]- lado de leitura do pipe;
 */
+              
               close(0);    //fechamos o teclado
               dup(p[0]);  // trocas o teclado pela extremidade p[0] do pipe.
               close(p[0]);//fechamos a extremidade do pipe para que n�o seja ecrito mais nada.
