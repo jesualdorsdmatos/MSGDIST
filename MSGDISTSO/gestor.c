@@ -61,13 +61,11 @@ varamb lervarambiente()
     }
     else
         strcpy(var.WORDSNOT, "WORDSNOT");
-
     return var;
 }
 
 void encerrar(int pidfilho)
 {
-    
     if(kill(pidfilho,SIGINT)!=0)
     printf("[ERRO] a encerrar verificador.\n");
     printf("Gestor encerrado com sucesso.\n");
@@ -78,8 +76,15 @@ void encerrar(int pidfilho)
 void help(){
     printf("Comando:Shutdown -> Encerrar gestor.\n");
     printf("Comando:Mensagem -> Permitir introduzir mensagem para o verificador.\n");
-    printf("Comando:Filter -> Argumento ON ou OFF, ativar filtro de mensagem para o verificador.\n");
-
+    printf("Comando:Filter -> Argumento ON ou OFF, Ativar/Desligar filtro de mensagem para o verificador.\n");
+    printf("Comando:Users -> Listar utilizadores.\n");
+    printf("Comando:Topics -> Listar topicos.\n");
+    printf("Comando:Msg -> Listar mensagens.\n");
+    printf("Comando:Topic -> Argumento [topico-em-questao], lista mensagens do topico.\n");
+    printf("Comando:Del -> Argumento [mensagem-em-questao], Apagar mensagem.\n");
+    printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
+    printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
+    printf("Comando:Prune -> Eliminar Topicos sem conteudo.\n");
 }
 
 int main(int argc, char *argv)
@@ -111,8 +116,6 @@ int main(int argc, char *argv)
     restfork=fork();
     if (restfork==0)
     {
-                   
-
         close(pipe1[WRITE]);
         close(pipe2[READ]);
         dup2(pipe1[READ], READ);
@@ -125,8 +128,6 @@ int main(int argc, char *argv)
         pidfilho=restfork;
     while (1)
     {
-
- 
         printf("Intoduza um comando: ");
         scanf(" %[^\n]", cmd);
         fflush(stdin);
