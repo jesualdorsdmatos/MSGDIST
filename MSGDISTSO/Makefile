@@ -1,4 +1,8 @@
-all:headercliente headergestor verificador gestor cliente
+all:headergeraldefinc headercliente headergestor verificador gestor cliente
+
+
+headergeraldefinc: geraldefinc.h
+	gcc geraldefinc.h
 
 headercliente :cliente_default.h
 	gcc cliente_default.h
