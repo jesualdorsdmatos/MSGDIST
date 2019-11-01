@@ -1,7 +1,8 @@
 #include "geraldefinc.h"
 #ifndef GESTOR_DEFAULT_h
 #define GESTOR_DEFAULT_h
-
+#define READ 0
+#define WRITE 1
 
 typedef struct variaveisamb{
     

@@ -50,7 +50,7 @@ int main(int argc, char *argv){
     char cmd[50],pal[50];
     cmds b;
     b.argumento=NULL;
-    int p[2],res;
+    int p_pai[2],p_filho[2],res;
     varamb var=lervarambiente();
 
 
@@ -65,42 +65,35 @@ int main(int argc, char *argv){
         cmd[i]= toupper(cmd[i]);
 
         b.comando=strtok(cmd," ");
-        b.argumento=strtok(NULL, " ");-
+        b.argumento=strtok(NULL, " ");
 
     if (strcmp(b.comando,"SHUTDOWN")==0){
        encerrar();
     }else if(strcmp(b.comando,"FILTER")==0 && b.argumento!=NULL){
         if(strcmp(b.argumento,"ON")==0){
-            //scanf("%s",pal);
-            pipe(p);//O pipe tem de ser criado antes do fork
-                 //para quando este for feito herdar a tabela de fd's
-            getchar();
-                fgets(pal,50,stdin);
+            pipe(p_pai);//O pipe tem de ser criado antes do fork
+            pipe(p_filho);    //para quando este for feito herdar a tabela de fd's fechamos a extremidade de leitura do pipe.
+           
+
          if(fork()==0){
-            /* p[0]-lado de escrita do pipe;//0-stdin;
-             1-stdout;
-             2-stderr;
-             //p[0]-lado de escrita do pipe;
-             //p[1]- lado de leitura do pipe;
-*/
-              
-              close(0);    //fechamos o teclado
-              dup(p[0]);  // trocas o teclado pela extremidade p[0] do pipe.
-              close(p[0]);//fechamos a extremidade do pipe para que n�o seja ecrito mais nada.
-              close(p[1]);// fechamos a extremidade de leitura do pipe.
-             execl("verificador","verificador",var.WORDSNOT,NULL);
+            close(READ);    //fechamos o teclado
+            dup(p_filho[READ]);  // trocas o teclado pela extremidade p[0] do pipe.   
+            close(p_filho[READ]); //fechamos a extremidade do pipe para que n�o seja ecrito mais nada.
+            close(p_filho[WRITE]);
+                  printf("Funciona o filho\n"); 
+            execl("verificador","verificador",var.WORDSNOT,NULL);
              exit(1);
          }
-         close(1);//fechamos ecr�
-         dup(p[1]);
-         close(p[1]);
-         close (p[0]);
-         //FILE* fd=fdopen(p[1],"w");
-         //char *c;
-         //fgets(c,1,fd);
-         printf("%s",pal);
-         close(1);
-         wait(NULL);
+         printf("agora estou no pai\n");
+         char buf[40];
+         close(WRITE);
+         dup(p_pai[WRITE]);  // trocas o teclado pela extremidade p[0] do pipe.
+         read(p_pai[WRITE],buf,40);
+         close(p_pai[READ]); //fechamos a extremidade do pipe para que n�o seja ecrito mais nada.
+         close(p_pai[WRITE]);
+         
+         
+    
         }else if(strcmp(b.argumento,"OFF")==0){
 
         }else
@@ -122,6 +115,10 @@ int main(int argc, char *argv){
         printf("[ERRO] Comando %s invalido ou falta de argumentos!\n",cmd);
     }
     //pause();
+    close(READ);
+    dup(0);
+    close(WRITE);
+    dup(1);
   }
 
 
