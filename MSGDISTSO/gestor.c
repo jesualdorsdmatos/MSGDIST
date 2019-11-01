@@ -65,11 +65,21 @@ varamb lervarambiente()
     return var;
 }
 
-void encerrar()
+void encerrar(int pidfilho)
 {
-    printf("O programa vai encerrar!\n");
+    
+    if(kill(pidfilho,SIGINT)!=0)
+    printf("[ERRO] a encerrar verificador.\n");
+    printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
     exit(0);
+}
+
+void help(){
+    printf("Comando:Shutdown -> Encerrar gestor.\n");
+    printf("Comando:Mensagem -> Permitir introduzir mensagem para o verificador.\n");
+    printf("Comando:Filter -> Argumento ON ou OFF, ativar filtro de mensagem para o verificador.\n");
+
 }
 
 int main(int argc, char *argv)
@@ -82,6 +92,8 @@ int main(int argc, char *argv)
     int pipe2[2];
     int filter = 0;
     int numerx = 0;
+    int pidfilho=0;
+    int restfork;
     imprimirin();
     varamb var = lervarambiente();
     if (pipe(pipe1) == -1)
@@ -94,9 +106,12 @@ int main(int argc, char *argv)
         fprintf(stderr, "[ERRO] Criacao pipe2\n\n");
         return 1;
     }
+    
 
-    if (fork() == 0)
+    restfork=fork();
+    if (restfork==0)
     {
+                   
 
         close(pipe1[WRITE]);
         close(pipe2[READ]);
@@ -104,11 +119,14 @@ int main(int argc, char *argv)
         dup2(pipe2[WRITE], WRITE);
         close(pipe1[READ]);
         close(pipe2[WRITE]);
-
         execl("verificador", "verificador", var.WORDSNOT, NULL);
-    }
+    }else{
+
+        pidfilho=restfork;
     while (1)
     {
+
+ 
         printf("Intoduza um comando: ");
         scanf(" %[^\n]", cmd);
         fflush(stdin);
@@ -122,7 +140,7 @@ int main(int argc, char *argv)
 
         if (strcmp(b.comando, "SHUTDOWN") == 0)
         {   
-            encerrar();
+            encerrar(pidfilho);
         }
         else if (strcmp(b.comando, "FILTER") == 0 && b.argumento != NULL)
         {
@@ -143,11 +161,15 @@ int main(int argc, char *argv)
         else if (strcmp(b.comando, "TOPICS") == 0)
         {
         }
+         else if (strcmp(b.comando, "HELP") == 0)
+        {
+        help();
+        }
         else if (strcmp(b.comando, "MSG") == 0)
         {
         }
         else if (strcmp(b.comando, "MENSAGEM") == 0)
-        {
+        {   
             printf("Introduz uma mensagem:");
             getchar();
             fgets(pal, sizeof(pal), stdin);
@@ -155,15 +177,15 @@ int main(int argc, char *argv)
             {
                 close(pipe1[READ]);
                 close(pipe2[WRITE]);
-                if (write(pipe1[WRITE], pal, sizeof(pal)) != sizeof(pal))
+                if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
                     fprintf(stderr, "[ERRO] Envio da mensagem!\n");
 
                 write(pipe1[WRITE], "\n", strlen("\n"));
 
-                if (write(pipe1[WRITE], "##MSGEND##\n", sizeof("##MSGEND##\n")) != sizeof("##MSGEND##\n"))
+                if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
                     fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
 
-                int nbytes = read(pipe2[READ], buffer, sizeof(buffer));
+                int nbytes = read(pipe2[READ], buffer, strlen(buffer));
                 if (nbytes <= 0)
                     fprintf(stderr, "[ERRO] A Ler do pipe2\n");
                 else
@@ -186,4 +208,5 @@ int main(int argc, char *argv)
             printf("[ERRO] Comando %s invalido ou falta de argumentos!\n", cmd);
         }
     }
+}
 }
