@@ -66,13 +66,12 @@ varamb lervarambiente()
 
 void encerrar(int pidfilho)
 {
-    if(kill(pidfilho,SIGINT)!=0)
+    if(kill(pidfilho,SIGUSR2)!=0)
     printf("[ERRO] a encerrar verificador.\n");
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
     exit(0);
 }
-
 
 void help(){
     printf("Comando:Shutdown -> Encerrar gestor.\n");
@@ -105,22 +104,22 @@ int main(int argc, char *argv)
     if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");
-        return 1;
+        exit(1);
     }
     if (pipe(pipe2) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe2\n\n");
-        return 1;
+        exit(1);
     }
 
     restfork=fork();
     if (restfork==0)
     {
-        close(pipe1[WRITE]);
+        close(pipe1[WRITE]);// como não são utilizadas estas duas extremidades são fechadas de imediato
         close(pipe2[READ]);
-        dup2(pipe1[READ], READ);
+        dup2(pipe1[READ], READ);// depois de fazer a troca dos fd's
         dup2(pipe2[WRITE], WRITE);
-        close(pipe1[READ]);
+        close(pipe1[READ]);// fechamos estas entradas que não vão ser utilizadas
         close(pipe2[WRITE]);
         execl("verificador", "verificador", var.WORDSNOT, NULL);
     }else{
@@ -147,11 +146,13 @@ int main(int argc, char *argv)
         {
             if (strcmp(b.argumento, "ON") == 0)
             {
-                filter = 1;
+            printf("O filtro das mensagens foi ativado com sucesso.\n");
+            filter = 1;
             }
             else if (strcmp(b.argumento, "OFF") == 0)
             {
-                filter = 0;
+           printf("O filtro das mensagens foi desativado com sucesso.\n");
+            filter = 0;
             }
             else
                 printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n", b.argumento);
@@ -170,24 +171,29 @@ int main(int argc, char *argv)
         {
         }
         else if (strcmp(b.comando, "MENSAGEM") == 0)
-        {   
+        { 
+            if(filter==0){
+                printf("Relembro que o filtro de mensagem esta desativado, para ativar comando [filter on].\n");
+            }  
             printf("Introduz uma mensagem:");
             getchar();
             fgets(pal, sizeof(pal), stdin);
             if (filter == 1)
             {
-                close(pipe1[READ]);
+                close(pipe1[READ]); 
                 close(pipe2[WRITE]);
                 if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
                     fprintf(stderr, "[ERRO] Envio da mensagem!\n");
 
-                write(pipe1[WRITE], "\n", strlen("\n"));
+                if(write(pipe1[WRITE], "\n", strlen("\n"))!=strlen("\n"))
+                    fprintf(stderr, "[ERRO] Envio do \\n \n");
+
 
                 if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
                     fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
 
                 int nbytes = read(pipe2[READ], buffer, strlen(buffer));
-                if (nbytes <= 0)
+                if (nbytes ==errno)
                     fprintf(stderr, "[ERRO] A Ler do pipe2\n");
                 else
                     numerx = atoi(buffer);

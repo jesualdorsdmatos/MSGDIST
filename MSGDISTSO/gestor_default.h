@@ -12,6 +12,18 @@ typedef struct variaveisamb{
     
 }varamb;
 
+typedef struct subscritos{
+char topicos[40];
+}subs;
+
+//Destina-se a guardar as subscrições por tópico associada a um utiliador
+typedef struct util_subsc{
+char username[40];
+ subs sub[40];
+}ut;
+
+
+
 typedef struct cmdguardar{
 
     char *comando;

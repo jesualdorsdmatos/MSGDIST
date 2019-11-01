@@ -1,10 +1,6 @@
-
-
 #include "geraldefinc.h"
 #include "cliente_default.h"
 #include <ncurses.h>
-
-
 
 
 void iniciarcurses(){
