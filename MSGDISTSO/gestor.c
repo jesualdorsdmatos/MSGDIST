@@ -1,4 +1,4 @@
-#include "gestor_default.h"
+:7#include "gestor_default.h"
 #include "geraldefinc.h"
 
 
@@ -44,7 +44,7 @@ varamb lervarambiente()
     else
         var.MAXMSG = atoi((getenv("MAXMSG")));
 
-    //M�ximo n�mero de palavras rejeitadas
+    //Maxima de palavras rejeitas
     if ((getenv("MAXNOT")) == NULL)
     {
         printf("MAXNOT default.\n");

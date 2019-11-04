@@ -13,6 +13,7 @@
 
 /* This function does what its name tells */
 void exitNow(int s) {
+    fprintf(stdout,"teste");
     exit(0);
 }
 
