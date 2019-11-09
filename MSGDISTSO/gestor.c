@@ -17,7 +17,7 @@ void imprimirfi()
     printf("*************************************************\n");
 }
 
-// Retira espacos a mais entre os comandos
+
 void removerespaco(char str[])
 {
     int j = 0;
@@ -60,14 +60,13 @@ varamb lervarambiente()
         strcpy(var.WORDSNOT, WORSNOTD);
     }
     else
-        strcpy(var.WORDSNOT, "WORDSNOT");
+        strcpy(var.WORDSNOT,getenv("WORDSNOT"));
     return var;
 }
 
 void encerrar(int pidfilho)
 {
-    //if(kill(pidfilho,SIGUSR2)!=0)
-    printf("[ERRO] a encerrar verificador.\n");
+    kill(pidfilho,SIGUSR2);
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
     exit(0);
@@ -115,15 +114,12 @@ int main(int argc, char *argv)
 
     restfork = fork();
     if (restfork == 0)
-    {
-        close(pipe1[WRITE]); // como não são utilizadas estas duas extremidades são fechadas de imediato
-        close(pipe2[READ]);
-        dup2(pipe1[READ], READ); // depois de fazer a troca dos fd's
-        dup2(pipe2[WRITE], WRITE);
-        close(pipe1[READ]); // fechamos estas entradas que não vão ser utilizadas
-        close(pipe2[WRITE]);
-        execl("verificador", "verificador", var.WORDSNOT, NULL);
-      
+    { 
+       close(pipe1[WRITE]);     // O dup2 fecha automáticamente a extremidade do pipe que não está a ser usado por exemplo o read.
+       close(pipe2[READ]);
+       dup2(pipe1[READ], READ);  //depois de fazer a troca dos fd's
+       dup2(pipe2[WRITE], WRITE); 
+       execl("verificador", "verificador", var.WORDSNOT, NULL);  
     }
     else
     {
@@ -220,4 +216,5 @@ int main(int argc, char *argv)
             }
         }
     }
+   
 }

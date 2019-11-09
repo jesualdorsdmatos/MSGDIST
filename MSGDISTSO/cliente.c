@@ -9,8 +9,8 @@ void iniciarcurses(){
     init_pair(1,COLOR_WHITE,COLOR_BLUE);
     init_pair(2,COLOR_BLUE,COLOR_WHITE);
     init_pair(3,COLOR_RED,COLOR_WHITE);
-    curs_set(0); //TORNAR CURSOR INVISIVEL
-    noecho();// aparece dados de teclado
+    curs_set(0);        //TORNAR CURSOR INVISIVEL
+    noecho();           // aparece dados de teclado
     keypad(stdscr,TRUE);//ativar teclado
 }
 

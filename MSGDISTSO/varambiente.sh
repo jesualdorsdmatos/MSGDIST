@@ -1,4 +1,4 @@
-#!/bin/sh
+
 
 export MAXMSG=100
 export MAXNOT=10
