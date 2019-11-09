@@ -22,7 +22,7 @@ typedef struct util_subsc{
 cli_dados cliente;
  subs sub[MAX];
 }utsub;
-
+// Estruturas para os comandos.
 typedef struct cmdguardar{
     char *comando;
     char *argumento;

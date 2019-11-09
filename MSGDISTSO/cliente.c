@@ -27,10 +27,10 @@ char username[MAX_USER];
 int main(int argc, char** argv) {
 
 
-    //WINDOW *menubarra;
-    //iniciarcurses();
-    //menubarra=subwin(stdscr,1,80,0,0);
-  if(argc!=2){
+    WINDOW *menubarra;
+    iniciarcurses();
+    menubarra=subwin(stdscr,1,80,0,0);
+  /*if(argc!=2){
    perror("[Erro] Falta especificar o username\n");
    exit(1);
   }
@@ -41,13 +41,13 @@ int main(int argc, char** argv) {
  }else{
 int fd_serv=open(SERV_PIPE,O_WRONLY);
 write(fd_serv,&username,sizeof(username));
- }
-    /*criar_menu(menubarra);
+ }*/
+    criar_menu(menubarra);
      refresh();
      wrefresh(menubarra);
      getch();
      delwin(menubarra);
-    endwin();*/
+    endwin();
 return 0;
 
     

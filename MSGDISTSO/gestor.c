@@ -105,7 +105,7 @@ int main(int argc, char *argv)
    /* if(access(SERV_PIPE,F_OK)){
          if(mkfifo(SERV_PIPE,0600)==-1){
             perror("[ERRO]na Criação do pipe do servidor.\n");
-        }
+        }   
        
     }else{
         printf("[Erro] Ja existe uma instancia do servidor a correr.\n");

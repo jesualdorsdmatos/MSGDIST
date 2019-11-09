@@ -32,7 +32,7 @@
 #define MAXNOTD 10
 #define WORSNOTD  "pal_bad.txt"
 #define SERV_PIPE "pipe_servidor"
-
+// Estrutura responsável por armazenar os dados de um cliente.
 typedef struct cli_dados{
 char username[MAX_USER];
 char nome_pipe[MAX_USER];
