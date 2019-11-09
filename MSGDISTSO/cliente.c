@@ -22,21 +22,32 @@ wbkgd(menubarra,COLOR_PAIR(2));
  waddstr(menubarra,"TOPICS");
 
 }
-/*
- * 
- */
+//Variáveis globais
+char username[MAX_USER];
 int main(int argc, char** argv) {
-  
-    WINDOW *menubarra;
-    iniciarcurses();
-    menubarra=subwin(stdscr,1,80,0,0);
-    criar_menu(menubarra);
-     refresh();
- wrefresh(menubarra);
-getch();
 
-    delwin(menubarra);
- endwin();
+
+    //WINDOW *menubarra;
+    //iniciarcurses();
+    //menubarra=subwin(stdscr,1,80,0,0);
+  if(argc!=2){
+   perror("[Erro] Falta especificar o username\n");
+   exit(1);
+  }
+ strcpy(username,argv[1]);
+ if (access(SERV_PIPE,F_OK)){
+   perror("[ERRO]O servidor nao esta a correr.\n");
+   exit(0);
+ }else{
+int fd_serv=open(SERV_PIPE,O_WRONLY);
+write(fd_serv,&username,sizeof(username));
+ }
+    /*criar_menu(menubarra);
+     refresh();
+     wrefresh(menubarra);
+     getch();
+     delwin(menubarra);
+    endwin();*/
 return 0;
 
     

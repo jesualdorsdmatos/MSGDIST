@@ -69,6 +69,7 @@ void encerrar(int pidfilho)
     kill(pidfilho,SIGUSR2);
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
+    unlink(SERV_PIPE);
     exit(0);
 }
 
@@ -101,6 +102,20 @@ int main(int argc, char *argv)
     int restfork;
     imprimirin();
     varamb var = lervarambiente();
+    if(access(SERV_PIPE,F_OK)){
+         if(mkfifo(SERV_PIPE,0600)==-1){
+            perror("[ERRO]na Criação do pipe do servidor.\n");
+        }
+       
+    }else{
+        printf("[Erro] Ja existe uma instancia do servidor a correr.\n");
+        exit(0);
+    }
+char username[MAX_USER];
+    int fd_serv=open(SERV_PIPE,O_RDONLY);
+    read(fd_serv,&username,sizeof(username));
+    
+    
     if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");
@@ -111,6 +126,7 @@ int main(int argc, char *argv)
         fprintf(stderr, "[ERRO] Criacao pipe2\n\n");
         exit(1);
     }
+
 
     restfork = fork();
     if (restfork == 0)

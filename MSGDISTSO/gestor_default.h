@@ -19,12 +19,9 @@ char topicos[MAX_TOPIC];
 
 //Destina-se a guardar as subscrições por tópico associada a um utiliador
 typedef struct util_subsc{
-char username[MAX];
-char nome_pipe[MAX];
+cli_dados cliente;
  subs sub[MAX];
-}ut;
-
-
+}utsub;
 
 typedef struct cmdguardar{
     char *comando;
