@@ -102,7 +102,7 @@ int main(int argc, char *argv)
     int restfork;
     imprimirin();
     varamb var = lervarambiente();
-    if(access(SERV_PIPE,F_OK)){
+   /* if(access(SERV_PIPE,F_OK)){
          if(mkfifo(SERV_PIPE,0600)==-1){
             perror("[ERRO]na Criação do pipe do servidor.\n");
         }
@@ -114,8 +114,8 @@ int main(int argc, char *argv)
 char username[MAX_USER];
     int fd_serv=open(SERV_PIPE,O_RDONLY);
     read(fd_serv,&username,sizeof(username));
-    
-    
+    puts(username);
+    */
     if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");

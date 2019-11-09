@@ -35,7 +35,7 @@
 
 typedef struct cli_dados{
 char username[MAX_USER];
-char nome_pipe[MAX];
+char nome_pipe[MAX_USER];
 int pid;
 }cli_dados;
 
