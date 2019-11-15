@@ -17,7 +17,7 @@ void imprimirfi()
     printf("*************************************************\n");
 }
 
-// Retira espacos a mais entre os comandos
+
 void removerespaco(char str[])
 {
     int j = 0;
@@ -60,16 +60,16 @@ varamb lervarambiente()
         strcpy(var.WORDSNOT, WORSNOTD);
     }
     else
-        strcpy(var.WORDSNOT, "WORDSNOT");
+        strcpy(var.WORDSNOT,getenv("WORDSNOT"));
     return var;
 }
 
 void encerrar(int pidfilho)
 {
-    //if(kill(pidfilho,SIGUSR2)!=0)
-    printf("[ERRO] a encerrar verificador.\n");
+    kill(pidfilho,SIGUSR2);
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
+    unlink(SERV_PIPE);
     exit(0);
 }
 
@@ -102,6 +102,20 @@ int main(int argc, char *argv)
     int restfork;
     imprimirin();
     varamb var = lervarambiente();
+   /* if(access(SERV_PIPE,F_OK)){
+         if(mkfifo(SERV_PIPE,0600)==-1){
+            perror("[ERRO]na Criação do pipe do servidor.\n");
+        }   
+       
+    }else{
+        printf("[Erro] Ja existe uma instancia do servidor a correr.\n");
+        exit(0);
+    }
+char username[MAX_USER];
+    int fd_serv=open(SERV_PIPE,O_RDONLY);
+    read(fd_serv,&username,sizeof(username));
+    puts(username);
+    */
     if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");
@@ -113,17 +127,15 @@ int main(int argc, char *argv)
         exit(1);
     }
 
+
     restfork = fork();
     if (restfork == 0)
-    {
-        close(pipe1[WRITE]); // como não são utilizadas estas duas extremidades são fechadas de imediato
-        close(pipe2[READ]);
-        dup2(pipe1[READ], READ); // depois de fazer a troca dos fd's
-        dup2(pipe2[WRITE], WRITE);
-        close(pipe1[READ]); // fechamos estas entradas que não vão ser utilizadas
-        close(pipe2[WRITE]);
-        execl("verificador", "verificador", var.WORDSNOT, NULL);
-      
+    { 
+       close(pipe1[WRITE]);     // O dup2 fecha automáticamente a extremidade do pipe que não está a ser usado por exemplo o read.
+       close(pipe2[READ]);
+       dup2(pipe1[READ], READ);  //depois de fazer a troca dos fd's
+       dup2(pipe2[WRITE], WRITE); 
+       execl("verificador", "verificador", var.WORDSNOT, NULL);  
     }
     else
     {
@@ -220,4 +232,5 @@ int main(int argc, char *argv)
             }
         }
     }
+   
 }

@@ -3,12 +3,13 @@
 #ifndef CLIENTE_DEFAULT_H
 #define CLIENTE_DEFAULT_H
 
-typedef struct msg_cli{
-    char topico[MAX_TOPIC];
-    char titulo[MAX_TITULO];
-    char corpo[MAX_CORPO];
-    int duracao;
-} msg_cli;
+//Estrutura responsável por armazenar os dados do tabuleiro da mensagem.
+typedef struct Config_Tab{
+int n_linhas,n_colunas;
+
+}Config_Tab;
+
+
 
 
 #endif /* CLIENTE_DEFAULT_H */
