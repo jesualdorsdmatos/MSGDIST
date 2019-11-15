@@ -18,3 +18,5 @@ verificador : verificador.c
 
 cliente : cliente.c
 	gcc cliente.c -o cliente -l ncurses
+clean: 
+	rm -f gestor cliente
