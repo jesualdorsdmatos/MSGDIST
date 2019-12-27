@@ -1,4 +1,4 @@
-#include "geraldefinc.h"
+  #include "geraldefinc.h"
 #include "cliente_default.h"
 #include <ncurses.h>
 #include <stdio.h>
@@ -11,7 +11,7 @@ void iniciarncurses(){
     init_pair(2,COLOR_GREEN,COLOR_BLUE);
     init_pair(3,COLOR_BLACK,COLOR_WHITE);
     init_pair(4,COLOR_WHITE,COLOR_BLACK);
-    curs_set(0);        //TORdNAR CURSOR INVISIVEL
+    curs_set(1);        //TORdNAR CURSOR INVISIVEL
     noecho();           // aparece dados de teclado
     keypad(stdscr,TRUE);//ativar teclado
 }
@@ -25,6 +25,7 @@ void clean( WINDOW *limpar){
 wbkgd(limpar,COLOR_PAIR(4));
 refresh();
 }
+
 
 
 void iniciar( WINDOW *intiwin){
@@ -65,12 +66,12 @@ return username;
 //Variáveis globais
 char username[MAX_USER];
 int main(int argc, char** argv) {
-
+int tecla;
 
   WINDOW *janelalogin,*intiwin,*limpar,*quadro1,*quadro2,*titulo,*topic,*mensagem,*listopic;
   iniciarncurses();
   limpar=newwin(0,0,0,0);
-  int x,y;
+  int x,y,linha=0,coluna=0;
 getmaxyx(limpar,x,y);
   janelalogin=newwin(1,50,x/2,(y/2)-(50/2));
   intiwin=newwin(0,0,0,0);
@@ -106,9 +107,40 @@ getmaxyx(limpar,x,y);
   wrefresh(quadro1);
   wrefresh(quadro2); 
   wrefresh(topic); 
-  wrefresh(mensagem); 
+  wrefresh(mensagem);
+  move(0,0);
+  refresh(); 
   getch();
+  getmaxyx(limpar,x,y);
+while(1){
+tecla=getch();
+switch(tecla){
 
+case KEY_LEFT:
+if(coluna>0)
+  coluna--;
+  move(linha,coluna);
+  refresh();
+ break;
+case KEY_RIGHT:
+  if(coluna<y)
+  coluna++;
+  move(linha,coluna);
+  refresh();
+ break;
+case KEY_UP:
+if(linha>0)
+  linha--;
+  move(linha,coluna);
+  refresh();
+break;
+case KEY_DOWN:
+if(linha<x-1)
+  linha++;
+  move(linha,coluna);
+  refresh();
+break;
+}}
 sair(); 
     
 }
