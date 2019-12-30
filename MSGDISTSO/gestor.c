@@ -87,7 +87,27 @@ void help()
     printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
     printf("Comando:Prune -> Eliminar Topicos sem conteudo.\n");
 }
+void * recebelogins() {
+   
+   
+   do{
+      cli_dados c;
+    printf("ESTOU DENTRO DA THread\n");
+      int fd_serv=open(SERV_PIPE,O_RDONLY);
+   read(fd_serv,&c,sizeof(cli_dados));
+   close(fd_serv);
+   printf("pedifo do cliente %s com o Pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe);
+    c.estado=1;
+   int fd_cliente=open(c.nome_pipe,O_WRONLY);
 
+   write(fd_cliente,&c,sizeof(cli_dados));
+   printf("Estad:%d\n",c.estado);
+    close(fd_cliente);
+  
+}while(1);
+
+printf("fim thread");
+}
 int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
@@ -100,9 +120,10 @@ int main(int argc, char *argv)
     int numerx = 0;
     int pidfilho = 0;
     int restfork;
+  
     imprimirin();
     varamb var = lervarambiente();
-   /* if(access(SERV_PIPE,F_OK)){
+   if(access(SERV_PIPE,F_OK)){
          if(mkfifo(SERV_PIPE,0600)==-1){
             perror("[ERRO]na Criação do pipe do servidor.\n");
         }   
@@ -111,11 +132,13 @@ int main(int argc, char *argv)
         printf("[Erro] Ja existe uma instancia do servidor a correr.\n");
         exit(0);
     }
-char username[MAX_USER];
-    int fd_serv=open(SERV_PIPE,O_RDONLY);
-    read(fd_serv,&username,sizeof(username));
-    puts(username);
-    */
+pthread_t tlogin;
+  
+
+       int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
+     
+ 
+    
     if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");

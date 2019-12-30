@@ -4,17 +4,18 @@
 
 //***********INCLUDES***********//
 
-#include <stdio.h>
+#include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
+#include <time.h>
+#include <pthread.h>
+#include <ctype.h>
 
 
 
@@ -32,11 +33,13 @@
 #define MAXNOTD 10
 #define WORSNOTD  "pal_bad.txt"
 #define SERV_PIPE "pipe_servidor"
+#define PIPE_CLI "cli_%d"
 // Estrutura responsável por armazenar os dados de um cliente.
 typedef struct cli_dados{
 char username[MAX_USER];
 char nome_pipe[MAX_USER];
 int pid;
+int estado;// 0- se não tiver sido aprovada e 1 em caso de aprovação
 }cli_dados;
 
 //Estrutura por armazenaros dados associados a uma mensagem enviada por um cliente

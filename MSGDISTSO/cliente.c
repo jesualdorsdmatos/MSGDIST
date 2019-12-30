@@ -1,147 +1,49 @@
-  #include "geraldefinc.h"
+#include "geraldefinc.h"
 #include "cliente_default.h"
 #include <ncurses.h>
 #include <stdio.h>
 #include <string.h>
 
-void iniciarncurses(){
-    initscr();
-    start_color();
-    init_pair(1,COLOR_WHITE,COLOR_BLUE);
-    init_pair(2,COLOR_GREEN,COLOR_BLUE);
-    init_pair(3,COLOR_BLACK,COLOR_WHITE);
-    init_pair(4,COLOR_WHITE,COLOR_BLACK);
-    curs_set(1);        //TORdNAR CURSOR INVISIVEL
-    noecho();           // aparece dados de teclado
-    keypad(stdscr,TRUE);//ativar teclado
+
+void main(){
+int fd_servidor,fd_cliente;
+cli_dados dados_login,new;
+// criar pipe login
+//verificar se o servidor está a correr //acess para o pipe dele
+
+//se não estiver mensagem de erro
+ fd_servidor=open(SERV_PIPE,O_RDWR);
+printf("introduz o username:");
+scanf(" %s",dados_login.username);
+dados_login.pid= getpid();
+dados_login.estado=0;
+sprintf(dados_login.nome_pipe,PIPE_CLI,dados_login.pid);
+
+write(fd_servidor,&dados_login,sizeof(cli_dados));
+
+fd_cliente=open(dados_login.nome_pipe,O_RDONLY);
+if(fd_cliente==-1){
+  printf("ERRO NO PIPE!");
 }
-void sair()
-{
-    endwin(); /*Sempre que finalizarmos um programa com a biblioteca curses,
-                     devemos executar este comando.*/
-    exit(0);  
+read(fd_cliente,&new,sizeof(cli_dados));
+printf("%d",dados_login.estado);
+if(new.estado!=1){
+  printf("ERRO nao pode logar!\n");
+  exit(1);
 }
-void clean( WINDOW *limpar){
-wbkgd(limpar,COLOR_PAIR(4));
-refresh();
+//->Confirmação se este se poder logar ou não e qual o seu username//read
+printf("\nTitulo:");
+
+/*
+scanf(" %[^\n]",dados.titulo);
+printf("\nTopic:");
+scanf(" %[^\n]",dados.topico);
+printf("\nMensagem:");
+scanf(" %[^\n]",dados.corpo);
+dados.ident=getpid();
+
+
+
+printf("%s\n%s\n%s\n%s\n%d",dados.user,dados.titulo,dados.topico,dados.corpo,dados.ident);
+*/
 }
-
-
-
-void iniciar( WINDOW *intiwin){
-  int x,y;
-  getmaxyx(intiwin,x,y);
-wbkgd(intiwin,COLOR_PAIR(1));
- box(intiwin, '|', '-');
- char welcome[40]="*********BEM-VINDO*********";
- char welcome1[40]="MSGDIST";
- char welcome2[80]="Trabalho realizado por: Jesualdo Matos e Francisco Silva";
- char welcome3[40]="Prime qualquer tecla para continuar";
- int valor=strlen(welcome);
- int valor1=strlen(welcome1);
- int valor2=strlen(welcome2);
- int valor3=strlen(welcome3);
-mvwprintw(intiwin,5,(y/2)-(valor/2),"%s",welcome);
-mvwprintw(intiwin,6,(y/2)-(valor1/2),"%s",welcome1);
-mvwprintw(intiwin,7,(y/2)-(valor2/2),"%s",welcome2);
-mvwprintw(intiwin,8,(y/2)-(valor3/2),"%s",welcome3);
-
-refresh();
-}
-
-char login( WINDOW *janelalogin,WINDOW *limpar){
-wbkgd(janelalogin,COLOR_PAIR(3));
-int x,y;
-  getmaxyx(limpar,x,y);
- mvprintw(x/2-1,y/2-(strlen("Indique o seu username")/2),"Indique o seu username:");
- refresh();
-char username[80];
-echo();
-wrefresh(janelalogin);
-wscanw(janelalogin,"%s",username);
-mvprintw(x/2+2,y/2-((strlen("O seu username:")+strlen(username))/2),"O seu username:%s",username);
-refresh();
-return username;
-}
-//Variáveis globais
-char username[MAX_USER];
-int main(int argc, char** argv) {
-int tecla;
-
-  WINDOW *janelalogin,*intiwin,*limpar,*quadro1,*quadro2,*titulo,*topic,*mensagem,*listopic;
-  iniciarncurses();
-  limpar=newwin(0,0,0,0);
-  int x,y,linha=0,coluna=0;
-getmaxyx(limpar,x,y);
-  janelalogin=newwin(1,50,x/2,(y/2)-(50/2));
-  intiwin=newwin(0,0,0,0);
-  quadro1=subwin(limpar,x-5,y/2,5,0);
-  quadro2=subwin(limpar,x-1,y/2,1,y/2);
-  topic=subwin(limpar,1,y/2,1,0);
-  mensagem=subwin(limpar,1,y/2,3,0);
-  iniciar(intiwin);
-  wrefresh(intiwin);
-  getch();  
-  delwin(intiwin);  
-  refresh();
-  clean(limpar);
-  wrefresh(limpar);
-  refresh();
-  login(janelalogin,limpar);
-  wrefresh(janelalogin);
-  getch();
-  wclear(janelalogin);
-
-  delwin(janelalogin);
-  refresh();
-  mvwprintw(limpar,0,0,"INDIQUE O TOPICO:");
-  mvwprintw(limpar,2,0,"INDIQUE O TITULO:");
-  mvwprintw(limpar,4,0,"INDIQUE A MENSAGEM:");
-  mvwprintw(limpar,0,y/2,"TOPICOS EXISTENTES:");
-
-  wrefresh(limpar);
-  wbkgd(quadro1,COLOR_PAIR(2));
-  wbkgd(topic,COLOR_PAIR(2));
-  wbkgd(mensagem,COLOR_PAIR(2));
-  wbkgd(quadro2,COLOR_PAIR(3));
-  wrefresh(quadro1);
-  wrefresh(quadro2); 
-  wrefresh(topic); 
-  wrefresh(mensagem);
-  move(0,0);
-  refresh(); 
-  getch();
-  getmaxyx(limpar,x,y);
-while(1){
-tecla=getch();
-switch(tecla){
-
-case KEY_LEFT:
-if(coluna>0)
-  coluna--;
-  move(linha,coluna);
-  refresh();
- break;
-case KEY_RIGHT:
-  if(coluna<y)
-  coluna++;
-  move(linha,coluna);
-  refresh();
- break;
-case KEY_UP:
-if(linha>0)
-  linha--;
-  move(linha,coluna);
-  refresh();
-break;
-case KEY_DOWN:
-if(linha<x-1)
-  linha++;
-  move(linha,coluna);
-  refresh();
-break;
-}}
-sair(); 
-    
-}
-
