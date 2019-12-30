@@ -1,6 +1,8 @@
 #include "gestor_default.h"
 #include "geraldefinc.h"
-
+    pthread_t lermensagem;
+    msg_cli mensagem[100];
+    int numero=0;
 void imprimirin()
 {
     printf("************************************************\n");
@@ -87,30 +89,43 @@ void help()
     printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
     printf("Comando:Prune -> Eliminar Topicos sem conteudo.\n");
 }
-void * recebelogins() {
+
+void * recebermensagens(void * nomepipe){
+      int fd_cliente=open(nomepipe,O_RDONLY);
+       int n=read(fd_cliente,&mensagem[numero],sizeof(msg_cli));
+        if(n!=-1){
+               
+                numero++;}
+                
+
    
+}
+void * recebelogins(){
    do{
       cli_dados c;
     printf("ESTOU DENTRO DA THread\n");
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
    if(c.estado!=1){
-    if(mkfifo(c.nome_pipe,0600)==-1){
-        printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe);
+    if(mkfifo(c.nome_pipe_leitura,0600)==-1){
+        printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
+    }
+     if(mkfifo(c.nome_pipe_escrita,0600)==-1){
+        printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
     }
     
-    printf("pedifo do cliente %s com o Pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe);
+    printf("pedido do cliente %s com o pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe_leitura);
     
-    int fd_cliente=open(c.nome_pipe,O_WRONLY);
+    int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
     c.estado=1;
     close(fd_serv);
-   write(fd_cliente,&c,sizeof(cli_dados));
-   printf("Estado:%d\n",c.estado);
-    
+    write(fd_cliente,&c,sizeof(cli_dados));
+    close(fd_cliente);  
+     int res_uti = pthread_create( &lermensagem, NULL, recebermensagens,(void*)&c.nome_pipe_leitura);  
    }
 }while(1);
 
-printf("fim thread");
+
 }
 int main(int argc, char *argv)
 {
@@ -204,7 +219,11 @@ int main(int argc, char *argv)
             {
             }
             else if (strcmp(b.comando, "TOPICS") == 0)
-            {
+            {   printf("\nTOPICS EXISTENTES:\n");
+                int i=0;
+                for(i;i<numero;i++){
+                printf("Topic:%s\n",mensagem[i].topico);
+                }
             }
             else if (strcmp(b.comando, "HELP") == 0)
             {
