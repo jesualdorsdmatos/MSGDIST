@@ -1,8 +1,10 @@
 #include "gestor_default.h"
 #include "geraldefinc.h"
     pthread_t lermensagem;
-    msg_cli mensagem[100];
-    int numero=0;
+    msg_cli *mensagem=NULL;
+    cli_dados * clientes=NULL;
+    int nMensagem=0;
+    int nUsers=0;
 void imprimirin()
 {
     printf("************************************************\n");
@@ -18,7 +20,52 @@ void imprimirfi()
     printf("**       Jesualdo Matos/Francisco Silva        **\n");
     printf("*************************************************\n");
 }
+void acrescentaMensagagem(msg_cli m){
+msg_cli *temp;
+  if (mensagem == NULL) {
+  temp = (msg_cli*) malloc(sizeof(msg_cli) * 1);
+      if(temp==NULL){
+                 printf("Erro a  alocar  memoria para o vetor das mensagens");
+             }else{
+            mensagem = temp;     
+            mensagem[nMensagem] = m;
+           nMensagem++;
+          }
+        } else {
+             temp = realloc(mensagem, ( nMensagem+ 1) * sizeof(msg_cli));
+             if(temp==NULL){
+                 printf("Erro a  realocar memoria para o vetor das mensagens");
+             }else{
+             mensagem=temp;
+              mensagem[nMensagem] = m;
+             nMensagem++;
+         }
+        }
+         
+}
+void acrescentaCliente (cli_dados c){
+cli_dados *temp;
+  if (clientes == NULL) {
+  temp = (cli_dados*) malloc(sizeof(cli_dados) * 1);
+      if(temp==NULL){
+                 printf("Erro a  alocar  memoria para o vetor das mensagens");
+             }else{
+            clientes = temp;     
+            clientes[nUsers] = c;
+           nUsers++;
+          }
+        } else {
+             temp = realloc(clientes, ( nUsers + 1) * sizeof(cli_dados));
+             if(temp==NULL){
+                 printf("Erro a  realocar memoria para o vetor das mensagens");
+             }else{
+             clientes=temp;
+              clientes[nUsers] = c;
+             nUsers++;
+         }
+        }
 
+}
 
 void removerespaco(char str[])
 {
@@ -92,10 +139,11 @@ void help()
 
 void * recebermensagens(void * nomepipe){
       int fd_cliente=open(nomepipe,O_RDONLY);
-       int n=read(fd_cliente,&mensagem[numero],sizeof(msg_cli));
+      msg_cli m;
+       int n=read(fd_cliente,&m,sizeof(msg_cli));
         if(n!=-1){
-               
-                numero++;}
+               acrescentaMensagagem(m);
+         }
                 
 
    
@@ -103,9 +151,9 @@ void * recebermensagens(void * nomepipe){
 void * recebelogins(){
    do{
       cli_dados c;
-    printf("ESTOU DENTRO DA THread\n");
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
+   acrescentaCliente(c);
    if(c.estado!=1){
     if(mkfifo(c.nome_pipe_leitura,0600)==-1){
         printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
@@ -115,7 +163,7 @@ void * recebelogins(){
     }
     
     printf("pedido do cliente %s com o pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe_leitura);
-    
+
     int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
     c.estado=1;
     close(fd_serv);
@@ -221,7 +269,7 @@ int main(int argc, char *argv)
             else if (strcmp(b.comando, "TOPICS") == 0)
             {   printf("\nTOPICS EXISTENTES:\n");
                 int i=0;
-                for(i;i<numero;i++){
+                for(i;i<nMensagem;i++){
                 printf("Topic:%s\n",mensagem[i].topico);
                 }
             }
