@@ -3,38 +3,43 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <string.h>
+cli_dados cliente;
+/*
+void * recebedadoslogin() {
+
+while(1){
+ 
+ }
+ }
 
 
+}
+
+}
+
+*/
 void main(){
 int fd_servidor,fd_cliente;
-cli_dados dados_login,new;
-// criar pipe login
-//verificar se o servidor está a correr //acess para o pipe dele
-
-//se não estiver mensagem de erro
- fd_servidor=open(SERV_PIPE,O_RDWR);
+int n=-1;
+fd_servidor=open(SERV_PIPE,O_RDWR);
 printf("introduz o username:");
-scanf(" %s",dados_login.username);
-dados_login.pid= getpid();
-dados_login.estado=0;
-sprintf(dados_login.nome_pipe,PIPE_CLI,dados_login.pid);
+scanf(" %s",cliente.username);
+cliente.pid= getpid();
+cliente.estado=0;
+sprintf(cliente.nome_pipe,PIPE_CLI,cliente.pid);
+write(fd_servidor,&cliente,sizeof(cli_dados));
+do{
+int fd_cliente=open(cliente.nome_pipe,O_RDONLY);
+n= read(fd_cliente,&cliente,sizeof(cli_dados));
 
-write(fd_servidor,&dados_login,sizeof(cli_dados));
-
-fd_cliente=open(dados_login.nome_pipe,O_RDONLY);
-if(fd_cliente==-1){
-  printf("ERRO NO PIPE!");
-}
-read(fd_cliente,&new,sizeof(cli_dados));
-printf("%d",dados_login.estado);
-if(new.estado!=1){
-  printf("ERRO nao pode logar!\n");
-  exit(1);
-}
-//->Confirmação se este se poder logar ou não e qual o seu username//read
-printf("\nTitulo:");
+if(n!=-1){
+printf("CONSEGUIR ler o username:%s, no pipe %s, estado:%d",cliente.username,cliente.nome_pipe,cliente.estado);
+}//}
+}while(n==-1);
+if(cliente.estado==1){
 
 /*
+scanf("")
 scanf(" %[^\n]",dados.titulo);
 printf("\nTopic:");
 scanf(" %[^\n]",dados.topico);
@@ -42,8 +47,10 @@ printf("\nMensagem:");
 scanf(" %[^\n]",dados.corpo);
 dados.ident=getpid();
 
-
-
-printf("%s\n%s\n%s\n%s\n%d",dados.user,dados.titulo,dados.topico,dados.corpo,dados.ident);
 */
+
+
 }
+}
+
+

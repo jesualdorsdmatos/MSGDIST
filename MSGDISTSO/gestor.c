@@ -89,21 +89,25 @@ void help()
 }
 void * recebelogins() {
    
-   
    do{
       cli_dados c;
     printf("ESTOU DENTRO DA THread\n");
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
-   close(fd_serv);
-   printf("pedifo do cliente %s com o Pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe);
+   if(c.estado!=1){
+    if(mkfifo(c.nome_pipe,0600)==-1){
+        printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe);
+    }
+    
+    printf("pedifo do cliente %s com o Pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe);
+    
+    int fd_cliente=open(c.nome_pipe,O_WRONLY);
     c.estado=1;
-   int fd_cliente=open(c.nome_pipe,O_WRONLY);
-
+    close(fd_serv);
    write(fd_cliente,&c,sizeof(cli_dados));
-   printf("Estad:%d\n",c.estado);
-    close(fd_cliente);
-  
+   printf("Estado:%d\n",c.estado);
+    
+   }
 }while(1);
 
 printf("fim thread");
@@ -132,10 +136,10 @@ int main(int argc, char *argv)
         printf("[Erro] Ja existe uma instancia do servidor a correr.\n");
         exit(0);
     }
-pthread_t tlogin;
+    pthread_t tlogin;
   
 
-       int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
+    int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
      
  
     
