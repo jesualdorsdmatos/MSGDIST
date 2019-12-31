@@ -5,7 +5,8 @@
 #include <string.h>
 cli_dados dados;
 msg_cli msg;
-int linha=0,coluna=0;
+
+int linha=1,coluna=0;
 void iniciarncurses(){
     initscr();
     start_color();
@@ -85,20 +86,21 @@ refresh();
 }
 //Variáveis globais
 int main(int argc, char** argv) {
-int valor=0;
-
+    
+int valor;
 int tecla;
-  WINDOW *janelalogin,*intiwin,*limpar,*quadro1,*quadro2,*titulo,*topic,*mensagem,*listopic;
+  WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic;
   iniciarncurses();
   limpar=newwin(0,0,0,0);
-  int x,y;
+int x,y;
 getmaxyx(limpar,x,y);
+
   janelalogin=newwin(1,50,x/2,(y/2)-(50/2));
   intiwin=newwin(0,0,0,0);
-  quadro1=subwin(limpar,x-8,y/2,5,0);
-  quadro2=subwin(limpar,x-1,y/2,1,y/2);
+  mensagem=subwin(limpar,x-8,y/2,5,0);
+  menu=subwin(limpar,x-1,y/2,1,y/2);
   topic=subwin(limpar,1,y/2,1,0);
-  mensagem=subwin(limpar,1,y/2,3,0);
+  titulo=subwin(limpar,1,y/2,3,0);
   iniciar(intiwin);
   wrefresh(intiwin);
   getch();  
@@ -117,46 +119,80 @@ getmaxyx(limpar,x,y);
   mvwprintw(limpar,0,0,"INDIQUE O TOPICO:");
   mvwprintw(limpar,2,0,"INDIQUE O TITULO:");
   mvwprintw(limpar,4,0,"INDIQUE A MENSAGEM:");
-  mvwprintw(limpar,0,y/2,"TOPICOS EXISTENTES:");
-  mvwprintw(limpar,x-2,0,"Deseja gravar a sua mensagem? Sim=1/Nao=0");
+  mvwprintw(limpar,0,y/2,"MENU:");
+  mvwprintw(limpar,x-2,0,"Deseja gravar? Sim=1|Nao=0:");
+  mvwprintw(menu,5,y/4-(strlen("Consultar lista de Topics-> OPCAO:1"))/2,"Consultar lista de Topics-> OPCAO:1");
+  mvwprintw(menu,6,y/4-(strlen("Consultar lista de Titulos-> OPCAO:2"))/2,"Consultar lista de Titulos-> OPCAO:2");
+  mvwprintw(menu,7,y/4-(strlen("Consultar lista de Mensagens-> OPCAO:3"))/2,"Consultar lista de Mensagens-> OPCAO:3");
+  mvwprintw(menu,8,y/4-(strlen("Subscrever/Cancelar subscricao de um topic-> OPCAO:4"))/2,"Subscrever/Cancelar subscricao de um topic-> OPCAO:4");
+    mvwprintw(menu,20,y/4-(strlen("Indique a sua opcao:"))/2,"Indique a sua opcao:");
+
+  wrefresh(menu);
   wrefresh(limpar);
-  wbkgd(quadro1,COLOR_PAIR(2));
+  wbkgd(titulo,COLOR_PAIR(2));
   wbkgd(topic,COLOR_PAIR(2));
   wbkgd(mensagem,COLOR_PAIR(2));
-  wbkgd(quadro2,COLOR_PAIR(3));
-  wrefresh(quadro1);
-  wrefresh(quadro2); 
+  wbkgd(menu,COLOR_PAIR(3));
+  wrefresh(titulo);
+  wrefresh(menu); 
   wrefresh(topic); 
   wrefresh(mensagem);
-  move(0,0);
   refresh(); 
   getch();
   getmaxyx(limpar,x,y);
 while(1){
+
+mvwprintw(menu,25,y/4,"linha:%d, Coluna:%d",linha,coluna);
+wrefresh(menu);
 refresh();
 tecla=getch();
 switch(tecla){
 case KEY_LEFT:
-if(coluna>0)
+if(coluna>0 && linha!=x-2)
   coluna--;
+    
   move(linha,coluna);
   refresh();
  break;
 case KEY_RIGHT:
-  if(coluna<y)
+  if(coluna<y/2-1){
   coluna++;
   move(linha,coluna);
-  refresh();
+  }else{
+    if(coluna==((y/2)+strlen("Indique a sua opcao:")/2+y/4)-1){
+  coluna++;}
+  move(21,(y/2)+strlen("Indique a sua opcao:")/2+y/4);
+  }refresh();
  break;
 case KEY_UP:
-if(linha>0)
-  linha--;
+    if(linha>1)
+    linha--;
+    if(linha==2)
+    linha=1;
+    if(linha==4)
+    linha=3;
+    if(linha==x-3){
+    linha=x-4;
+    coluna=strlen("Deseja gravar? Sim=1|Nao=0:");
+}
   move(linha,coluna);
+
+  
   refresh();
 break;
 case KEY_DOWN:
-if(linha<x-1)
+if(linha<x-2)
   linha++;
+  if(linha==2)
+  linha=3;
+  if(linha==0)
+  linha=1;
+  if(linha==4)
+  linha=5;
+  if(linha==x-3){
+    linha=x-2;
+    coluna=strlen("Deseja gravar? Sim=1|Nao=0:");
+  }
   move(linha,coluna);
   refresh();
   break;
@@ -165,14 +201,17 @@ if(linha==1)
 wscanw(topic," %[^\n]",msg.topico);
 if(linha==3)
 wscanw(titulo," %[^\n]",msg.titulo);
-if(linha>=5)
-wscanw(quadro1," %[^\n]",msg.corpo);
-if(linha==x-1)
-wscanw(limpar,x-1,y,&valor);
+if(linha>=5&& linha <x-2)
+wscanw(mensagem," %[^\n]",msg.corpo);
+if(linha==x-2)
+mvwscanw(limpar,x-2,strlen("Deseja gravar? Sim=1|Nao=0:"),"%d",&valor);
+mvwprintw(menu,26,y/4,"valor tem:%d",valor);
+wrefresh(menu);
+
+wrefresh(limpar);
 if(valor==1){
   int fd_cliente=open(dados.nome_pipe_leitura,O_WRONLY);
 write(fd_cliente,&msg,sizeof(msg_cli));
-printf("foi enviado a sua mensagem\n");
 }
 break;
 }}
