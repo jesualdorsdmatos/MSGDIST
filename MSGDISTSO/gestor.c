@@ -3,6 +3,7 @@
     pthread_t lermensagem;
     msg_cli mensagem[100];
     int numero=0;
+    cli_dados c;
 void imprimirin()
 {
     printf("************************************************\n");
@@ -127,6 +128,18 @@ void * recebelogins(){
 
 
 }
+
+
+
+
+void * enviartopics(){
+    do{
+     int fd_mensagem=open(c.nome_pipe_escrita,O_WRONLY);
+    write(fd_mensagem,&mensagem,sizeof(msg_cli));
+}while(1);
+}
+
+
 int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
@@ -152,10 +165,10 @@ int main(int argc, char *argv)
         exit(0);
     }
     pthread_t tlogin;
-  
+    pthread_t enviarmensagem;
 
     int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
-     
+    int res_mensagem=pthread_create(&enviarmensagem,NULL,enviarmensagem,NULL); 
  
     
     if (pipe(pipe1) == -1)

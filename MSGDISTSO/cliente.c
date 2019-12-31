@@ -7,6 +7,8 @@ cli_dados dados;
 msg_cli msg;
 
 int linha=1,coluna=0;
+
+
 void iniciarncurses(){
     initscr();
     start_color();
@@ -86,8 +88,7 @@ refresh();
 }
 //Variáveis globais
 int main(int argc, char** argv) {
-    
-int valor;
+int input1,input2;
 int tecla;
   WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic;
   iniciarncurses();
@@ -121,11 +122,10 @@ getmaxyx(limpar,x,y);
   mvwprintw(limpar,4,0,"INDIQUE A MENSAGEM:");
   mvwprintw(limpar,0,y/2,"MENU:");
   mvwprintw(limpar,x-2,0,"Deseja gravar? Sim=1|Nao=0:");
-  mvwprintw(menu,5,y/4-(strlen("Consultar lista de Topics-> OPCAO:1"))/2,"Consultar lista de Topics-> OPCAO:1");
-  mvwprintw(menu,6,y/4-(strlen("Consultar lista de Titulos-> OPCAO:2"))/2,"Consultar lista de Titulos-> OPCAO:2");
-  mvwprintw(menu,7,y/4-(strlen("Consultar lista de Mensagens-> OPCAO:3"))/2,"Consultar lista de Mensagens-> OPCAO:3");
-  mvwprintw(menu,8,y/4-(strlen("Subscrever/Cancelar subscricao de um topic-> OPCAO:4"))/2,"Subscrever/Cancelar subscricao de um topic-> OPCAO:4");
-    mvwprintw(menu,20,y/4-(strlen("Indique a sua opcao:"))/2,"Indique a sua opcao:");
+  mvwprintw(menu,5,y/4-(strlen("Consultar lista de Topics------------------>"))/2,"Consultar lista de Topics------------------>");
+  mvwprintw(menu,6,y/4-(strlen("Consultar lista de Titulos----------------->"))/2,"Consultar lista de Titulos----------------->");
+  mvwprintw(menu,7,y/4-(strlen("Consultar lista de Mensagens--------------->"))/2,"Consultar lista de Mensagens--------------->");
+  mvwprintw(menu,8,y/4-(strlen("Subscrever/Cancelar subscricao de um topic->"))/2,"Subscrever/Cancelar subscricao de um topic->");
 
   wrefresh(menu);
   wrefresh(limpar);
@@ -150,7 +150,8 @@ switch(tecla){
 case KEY_LEFT:
 if(coluna>0 && linha!=x-2)
   coluna--;
-    
+if(coluna>y/2)
+{coluna=(y/2)-1;}    
   move(linha,coluna);
   refresh();
  break;
@@ -158,11 +159,14 @@ case KEY_RIGHT:
   if(coluna<y/2-1){
   coluna++;
   move(linha,coluna);
-  }else{
-    if(coluna==((y/2)+strlen("Indique a sua opcao:")/2+y/4)-1){
-  coluna++;}
-  move(21,(y/2)+strlen("Indique a sua opcao:")/2+y/4);
-  }refresh();
+  }else
+  {
+    
+  coluna=(y/2)+(y/4)+(strlen("Consultar lista de Topics------------------>")/2);
+  linha=6;
+  }
+  move(linha,coluna);
+  refresh();
  break;
 case KEY_UP:
     if(linha>1)
@@ -201,18 +205,36 @@ if(linha==1)
 wscanw(topic," %[^\n]",msg.topico);
 if(linha==3)
 wscanw(titulo," %[^\n]",msg.titulo);
-if(linha>=5&& linha <x-2)
+if(linha>=5 && linha <x-2 && coluna < (y/2))
 wscanw(mensagem," %[^\n]",msg.corpo);
-if(linha==x-2)
-mvwscanw(limpar,x-2,strlen("Deseja gravar? Sim=1|Nao=0:"),"%d",&valor);
-mvwprintw(menu,26,y/4,"valor tem:%d",valor);
+if(coluna>=(y/2)){
+if(linha==6){
+move(linha,coluna);
+int fd_mensagem=open(dados.nome_pipe_escrita,O_RDONLY);
+int n=read(fd_mensagem,&msg,sizeof(msg_cli));
+
+  mvwprintw(menu,5,y/4-(strlen(msg.topico)),"%s",msg.topico);
+
+
+
+
+}
+
+mvwprintw(menu,28,y/4,"JAVALI");
 wrefresh(menu);
 
+
+
+}
+
+if(linha==x-2)
+mvwscanw(limpar,x-2,strlen("Deseja gravar? Sim=1|Nao=0:"),"%d",&input1);
 wrefresh(limpar);
-if(valor==1){
+if(input1==1){
   int fd_cliente=open(dados.nome_pipe_leitura,O_WRONLY);
 write(fd_cliente,&msg,sizeof(msg_cli));
 }
+
 break;
 }}
 sair(); 
