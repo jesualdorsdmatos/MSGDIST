@@ -43,6 +43,35 @@ msg_cli *temp;
         }
          
 }
+void remove_spaces(char* s) {
+    const char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
+}
+void verificaDadosCliente(cli_dados *c){
+    int i=0;
+    int j=0;
+    char numero[2]="";
+    char nome[MAX_USER]="";
+for ( i=0; i< strlen(c->username);i++){
+    if(isdigit(c->username[i])==0){
+        nome[i]=c->username[i];
+    }else {
+    numero[j]= c->username[i];
+    j++;
+    }
+}
+char *num=strtok(numero," ");
+char *nom=strtok(nome," ");
+
+printf("dados: nome %s",nome);
+printf("       numero %s", num);
+
+
+}
 void acrescentaCliente (cli_dados c){
 cli_dados *temp;
   if (clientes == NULL) {
@@ -55,11 +84,14 @@ cli_dados *temp;
            nUsers++;
           }
         } else {
+            
              temp = realloc(clientes, ( nUsers + 1) * sizeof(cli_dados));
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              clientes=temp;
+
+             verificaDadosCliente(&c);
               clientes[nUsers] = c;
              nUsers++;
          }
