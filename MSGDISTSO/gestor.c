@@ -5,8 +5,7 @@
     cli_dados * clientes=NULL;
     int nMensagem=0;
     int nUsers=0;
-
-void imprimirin()
+    void imprimirin()
 {
     printf("************************************************\n");
     printf("**       BEM-VINDO AO GESTOR DO MSGDIST       **\n");
@@ -44,6 +43,35 @@ msg_cli *temp;
         }
          
 }
+void remove_spaces(char* s) {
+    const char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
+}
+void verificaDadosCliente(cli_dados *c){
+    int i=0;
+    int j=0;
+    char numero[2]="";
+    char nome[MAX_USER]="";
+for ( i=0; i< strlen(c->username);i++){
+    if(isdigit(c->username[i])==0){
+        nome[i]=c->username[i];
+    }else {
+    numero[j]= c->username[i];
+    j++;
+    }
+}
+char *num=strtok(numero," ");
+char *nom=strtok(nome," ");
+
+printf("dados: nome %s",nom);
+printf("       numero %s", num);
+
+
+}
 void acrescentaCliente (cli_dados c){
 cli_dados *temp;
   if (clientes == NULL) {
@@ -55,12 +83,13 @@ cli_dados *temp;
             clientes[nUsers] = c;
            nUsers++;
           }
-        } else {
+        } else {        
              temp = realloc(clientes, ( nUsers + 1) * sizeof(cli_dados));
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              clientes=temp;
+             verificaDadosCliente(&c);
               clientes[nUsers] = c;
              nUsers++;
          }
@@ -151,7 +180,7 @@ void * recebermensagens(void * nomepipe){
 }
 void * recebelogins(){
    do{
-      cli_dados c;
+     cli_dados c;
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
    acrescentaCliente(c);
@@ -178,16 +207,13 @@ void * recebelogins(){
 }
 
 
-
-
+/*
 void * enviartopics(){
     do{
      int fd_mensagem=open(c.nome_pipe_escrita,O_WRONLY);
     write(fd_mensagem,&mensagem,sizeof(msg_cli));
 }while(1);
-}
-
-
+}*/
 int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
@@ -213,13 +239,12 @@ int main(int argc, char *argv)
         exit(0);
     }
     pthread_t tlogin;
-    pthread_t enviarmensagem;
+   pthread_t enviarmensagem;
 
     int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
-    int res_mensagem=pthread_create(&enviarmensagem,NULL,enviarmensagem,NULL); 
- 
-    
-    if (pipe(pipe1) == -1)
+      int res_mensagem=pthread_create(&enviarmensagem,NULL,enviarmensagem,NULL); 
+   
+       if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");
         exit(1);
