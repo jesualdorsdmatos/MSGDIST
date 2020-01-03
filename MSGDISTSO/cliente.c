@@ -5,7 +5,6 @@
 #include <string.h>
 cli_dados dados;
 msg_cli msg;
-
 int linha=1,coluna=0;
 
 
@@ -142,6 +141,8 @@ getmaxyx(limpar,x,y);
   getmaxyx(limpar,x,y);
 while(1){
 
+  mvwprintw(limpar,x-2,0,"Deseja gravar? Sim=1|Nao=0:    ");
+wrefresh(limpar);
 mvwprintw(menu,25,y/4,"linha:%d, Coluna:%d",linha,coluna);
 wrefresh(menu);
 refresh();
@@ -201,6 +202,8 @@ if(linha<x-2)
   refresh();
   break;
 case ENTER:
+  mvwprintw(limpar,x-1,0,"                                        ");
+    wrefresh(limpar);
 if(linha==1)
 wscanw(topic," %[^\n]",msg.topico);
 if(linha==3)
@@ -219,9 +222,7 @@ int n=read(fd_mensagem,&msg,sizeof(msg_cli));
 
 
 }
-
-mvwprintw(menu,28,y/4,"JAVALI");
-wrefresh(menu);
+;
 
 
 
@@ -233,6 +234,15 @@ wrefresh(limpar);
 if(input1==1){
   int fd_cliente=open(dados.nome_pipe_leitura,O_WRONLY);
 write(fd_cliente,&msg,sizeof(msg_cli));
+werase(topic);
+wrefresh(topic);
+werase(titulo);
+wrefresh(titulo);
+werase(mensagem);
+wrefresh(mensagem);
+input1=0;
+mvwprintw(limpar,x-1,0,"Mensagem enviada com sucesso");
+wrefresh(limpar);
 }
 
 break;
@@ -240,4 +250,3 @@ break;
 sair(); 
  }   
 }
-

@@ -3,8 +3,11 @@
     pthread_t lermensagem;
     msg_cli *mensagem=NULL;
     cli_dados * clientes=NULL;
+    subs *listatopics=NULL;
+
     int nMensagem=0;
     int nUsers=0;
+    int nTopics=0;
     void imprimirin()
 {
     printf("************************************************\n");
@@ -27,8 +30,11 @@ msg_cli *temp;
       if(temp==NULL){
                  printf("Erro a  alocar  memoria para o vetor das mensagens");
              }else{
+                 temp->total=nMensagem;
             mensagem = temp;     
             mensagem[nMensagem] = m;
+            acrescentartopic(mensagem[nMensagem]);
+
            nMensagem++;
           }
         } else {
@@ -36,9 +42,14 @@ msg_cli *temp;
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
+                 temp->total=nMensagem;
              mensagem=temp;
               mensagem[nMensagem] = m;
+            acrescentartopic(mensagem[nMensagem]);
              nMensagem++;
+             
+
+         
          }
         }
          
@@ -56,24 +67,66 @@ void verificaDadosCliente(cli_dados *c){
     int j=0;
     char numero[2]="";
     char nome[MAX_USER]="";
-for ( i=0; i< strlen(c->username);i++){
+    for ( i=0; i< strlen(c->username);i++){
     if(isdigit(c->username[i])==0){
         nome[i]=c->username[i];
     }else {
     numero[j]= c->username[i];
     j++;
     }
+    }
+    char *num=strtok(numero," ");
+    char *nom=strtok(nome," ");
+
+    printf("dados: nome %s",nom);
+    printf("       numero %s", num);
+
+
 }
-char *num=strtok(numero," ");
-char *nom=strtok(nome," ");
 
-printf("dados: nome %s",nom);
-printf("       numero %s", num);
 
+
+
+
+void acrescentartopic (msg_cli informacao){
+    subs *temp;
+
+    printf(" topic recebi %s, valor de total:%d\n ",informacao.topico,nTopics);
+  if (listatopics == NULL) {
+  temp = (subs*) malloc(sizeof(subs) * 1);
+      if(temp==NULL){
+                 printf("Erro a  alocar  memoria para o vetor das mensagens");
+             }else{
+            listatopics = temp;     
+            strcpy(listatopics[nTopics].topicos,informacao.topico);
+           nTopics++;
+          }
+        } else {        
+             temp = realloc(clientes, ( nUsers + 1) * sizeof(cli_dados));
+             if(temp==NULL){
+                 printf("Erro a  realocar memoria para o vetor das mensagens");
+             }else{
+             listatopics=temp;
+              strcpy(listatopics[nTopics].topicos,informacao.topico);
+             nTopics++;
+         }
+        }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 void acrescentaCliente (cli_dados c){
-cli_dados *temp;
+    cli_dados *temp;
   if (clientes == NULL) {
   temp = (cli_dados*) malloc(sizeof(cli_dados) * 1);
       if(temp==NULL){
@@ -99,8 +152,8 @@ cli_dados *temp;
 
 void removerespaco(char str[])
 {
-    int j = 0;
-    for (int i = 0; str[i]; i++)
+    int j = 0, i =0;
+    for ( i = 0; str[i]; i++)
     {
         if (str[i] != ' ' || (str[i - 1] != ' '))
         {
@@ -168,6 +221,7 @@ void help()
 }
 
 void * recebermensagens(void * nomepipe){
+    do{
       int fd_cliente=open(nomepipe,O_RDONLY);
       msg_cli m;
        int n=read(fd_cliente,&m,sizeof(msg_cli));
@@ -175,8 +229,10 @@ void * recebermensagens(void * nomepipe){
                acrescentaMensagagem(m);
          }
                 
+                printf("teste mensagem\n");
+                sleep(4);
 
-   
+   }while(1);
 }
 void * recebelogins(){
    do{
@@ -201,19 +257,29 @@ void * recebelogins(){
     close(fd_cliente);  
      int res_uti = pthread_create( &lermensagem, NULL, recebermensagens,(void*)&c.nome_pipe_leitura);  
    }
-}while(1);
+    }while(1);
 
 
 }
 
 
-/*
-void * enviartopics(){
+
+void * enviarmensagens(){
     do{
-     int fd_mensagem=open(c.nome_pipe_escrita,O_WRONLY);
-    write(fd_mensagem,&mensagem,sizeof(msg_cli));
+        printf("teste\n");
+        sleep(2);
+      int fd_mensagem;
+        int i=0,j=0;
+        for(i=0;i<nUsers;i++){
+            for(j=0;j<nMensagem;j++){
+     printf("valor de i:%d, valor de j:%d valor do total:%d\n",i,j,mensagem->total);
+      fd_mensagem=open(clientes[i].nome_pipe_escrita,O_WRONLY);
+    write(fd_mensagem,&mensagem[j],sizeof(msg_cli));
+    }
+    }
 }while(1);
-}*/
+}
+
 int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
@@ -239,10 +305,12 @@ int main(int argc, char *argv)
         exit(0);
     }
     pthread_t tlogin;
-   pthread_t enviarmensagem;
+    pthread_t enviarmsg;
 
-    int res_uti = pthread_create( &tlogin, NULL, recebelogins, NULL);
-      int res_mensagem=pthread_create(&enviarmensagem,NULL,enviarmensagem,NULL); 
+    int res_login = pthread_create( &tlogin, NULL, recebelogins, NULL);
+    int res_enviarmensagem = pthread_create( &enviarmsg, NULL, enviarmensagens, NULL);
+
+    
    
        if (pipe(pipe1) == -1)
     {
@@ -275,8 +343,8 @@ int main(int argc, char *argv)
             scanf(" %[^\n]", cmd);
             fflush(stdin);
             removerespaco(cmd);
-
-            for (int i = 0; i < strlen(cmd); i++)
+            int i;
+            for ( i = 0; i < strlen(cmd); i++)
                 cmd[i] = toupper(cmd[i]);
 
             b.comando = strtok(cmd, " ");
@@ -307,8 +375,8 @@ int main(int argc, char *argv)
             else if (strcmp(b.comando, "TOPICS") == 0)
             {   printf("\nTOPICS EXISTENTES:\n");
                 int i=0;
-                for(i;i<nMensagem;i++){
-                printf("Topic:%s\n",mensagem[i].topico);
+                for(i;i<nTopics;i++){
+                printf("Topic:%s\n",listatopics[i].topicos);
                 }
             }
             else if (strcmp(b.comando, "HELP") == 0)

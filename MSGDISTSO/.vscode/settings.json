@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "geraldefinc.h": "c"
+        "geraldefinc.h": "c",
+        "gestor_default.h": "c"
     }
 }

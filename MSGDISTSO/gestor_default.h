@@ -34,6 +34,6 @@ void removerespaco(char str[]);// Retira espacos a mais entre os comandos(Utiliz
 varamb lervarambiente(); //Função responsável por ler as variavéis de ambiente e armazená-las numa estrutura.
 void encerrar(int pidfilho);//Função associada ao comando shutdown responsável por encerrar o verificador corretamente.
 void help();//Função associada ao comando help onde elucida o utilizador sobre o funcionamento da consola.
-
+void acrescentartopic (msg_cli c);
 
 #endif /* GESTOR_DEFAULT_h */

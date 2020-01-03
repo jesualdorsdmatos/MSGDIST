@@ -52,6 +52,7 @@ typedef struct msg_cli{
     char corpo[MAX_CORPO];
     int ident;
     int duracao;
+    int total;
 } msg_cli;
 
 #endif /* GERALDEFINC_H */
