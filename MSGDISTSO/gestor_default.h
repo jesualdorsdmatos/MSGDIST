@@ -15,6 +15,7 @@ typedef struct variaveisamb{
 //Estrutura responsavel por armazenar todos os topicos atualmente existentes.
 typedef struct subscritos{
 char topicos[MAX_TOPIC];
+int total;
 }subs;
 
 //Destina-se a guardar as subscrições por tópico associada a um utiliador
@@ -35,5 +36,5 @@ varamb lervarambiente(); //Função responsável por ler as variavéis de ambien
 void encerrar(int pidfilho);//Função associada ao comando shutdown responsável por encerrar o verificador corretamente.
 void help();//Função associada ao comando help onde elucida o utilizador sobre o funcionamento da consola.
 void acrescentartopic (msg_cli c);
-
+void * enviartopics();
 #endif /* GESTOR_DEFAULT_h */

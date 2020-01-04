@@ -1,6 +1,8 @@
 #include "gestor_default.h"
 #include "geraldefinc.h"
     pthread_t lermensagem;
+    pthread_t enviartop;
+
     msg_cli *mensagem=NULL;
     cli_dados * clientes=NULL;
     subs *listatopics=NULL;
@@ -24,7 +26,7 @@ void imprimirfi()
     printf("*************************************************\n");
 }
 void acrescentaMensagagem(msg_cli m){
-msg_cli *temp;
+    msg_cli *temp;
   if (mensagem == NULL) {
   temp = (msg_cli*) malloc(sizeof(msg_cli) * 1);
       if(temp==NULL){
@@ -54,6 +56,7 @@ msg_cli *temp;
         }
          
 }
+
 void remove_spaces(char* s) {
     const char* d = s;
     do {
@@ -62,6 +65,8 @@ void remove_spaces(char* s) {
         }
     } while (*s++ = *d++);
 }
+
+
 void verificaDadosCliente(cli_dados *c){
     int i=0;
     int j=0;
@@ -78,9 +83,6 @@ void verificaDadosCliente(cli_dados *c){
     char *num=strtok(numero," ");
     char *nom=strtok(nome," ");
 
-    printf("dados: nome %s",nom);
-    printf("       numero %s", num);
-
 
 }
 
@@ -90,8 +92,6 @@ void verificaDadosCliente(cli_dados *c){
 
 void acrescentartopic (msg_cli informacao){
     subs *temp;
-
-    printf(" topic recebi %s, valor de total:%d\n ",informacao.topico,nTopics);
   if (listatopics == NULL) {
   temp = (subs*) malloc(sizeof(subs) * 1);
       if(temp==NULL){
@@ -100,30 +100,24 @@ void acrescentartopic (msg_cli informacao){
             listatopics = temp;     
             strcpy(listatopics[nTopics].topicos,informacao.topico);
            nTopics++;
+        listatopics[nTopics].total=nTopics;
+
+          
           }
         } else {        
-             temp = realloc(clientes, ( nUsers + 1) * sizeof(cli_dados));
+             temp = realloc(listatopics, ( nTopics + 1) * sizeof(subs));
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              listatopics=temp;
               strcpy(listatopics[nTopics].topicos,informacao.topico);
              nTopics++;
+                     listatopics[nTopics].total=nTopics;
+
          }
         }
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 void acrescentaCliente (cli_dados c){
     cli_dados *temp;
@@ -228,9 +222,6 @@ void * recebermensagens(void * nomepipe){
         if(n!=-1){
                acrescentaMensagagem(m);
          }
-                
-                printf("teste mensagem\n");
-                sleep(4);
 
    }while(1);
 }
@@ -248,14 +239,14 @@ void * recebelogins(){
         printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
     }
     
-    printf("pedido do cliente %s com o pid %d e com o pipe %s\n",c.username,c.pid,c.nome_pipe_leitura);
-
     int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
     c.estado=1;
     close(fd_serv);
     write(fd_cliente,&c,sizeof(cli_dados));
     close(fd_cliente);  
      int res_uti = pthread_create( &lermensagem, NULL, recebermensagens,(void*)&c.nome_pipe_leitura);  
+    int res_topicsenviar = pthread_create( &enviartop, NULL, enviartopics, NULL);
+    
    }
     }while(1);
 
@@ -264,20 +255,43 @@ void * recebelogins(){
 
 
 
-void * enviarmensagens(){
+void * enviartopics(){
+    int fd_topics;
     do{
-        printf("teste\n");
-        sleep(2);
-      int fd_mensagem;
-        int i=0,j=0;
-        for(i=0;i<nUsers;i++){
-            for(j=0;j<nMensagem;j++){
-     printf("valor de i:%d, valor de j:%d valor do total:%d\n",i,j,mensagem->total);
-      fd_mensagem=open(clientes[i].nome_pipe_escrita,O_WRONLY);
-    write(fd_mensagem,&mensagem[j],sizeof(msg_cli));
+        sleep(1);
+      printf("iniciothread\n");
+
+   int i=0,j=0;
+    int r=0;
+    atendercli atender;
+    printf("aqui\n");
+    fflush(stdout);
+   
+    printf("a espera da flag:%d\n",atender.flag);
+fflush(stdout);
+    int fd_flags=open(PIPE_CHAMADA,O_RDONLY);
+    read(fd_flags,&atender,sizeof(atendercli));
+        printf("a espera de clientes\n");
+    close(fd_flags);
+    
+    if(atender.flag==1){
+            fd_topics=open(atender.nome_pipe_escrita,O_WRONLY);
+
+            for(j=0;j<nTopics;j++){
+        printf("enviar topic:%s\n",listatopics[j].topicos);
+        fflush(stdout);
+    write(fd_topics,&listatopics[j],sizeof(subs));
+    printf("no ciclo for\n");
     }
+            close(fd_topics);
+
+
     }
+      printf("fim1\n");
+        atender.flag=0;
 }while(1);
+      printf("fim2\n");
+
 }
 
 int main(int argc, char *argv)
@@ -304,11 +318,18 @@ int main(int argc, char *argv)
         printf("[Erro] Ja existe uma instancia do servidor a correr.\n");
         exit(0);
     }
+     if(access(PIPE_CHAMADA,F_OK)){
+         if(mkfifo(PIPE_CHAMADA,0600)==-1){
+            perror("[ERRO]na Criação do pipe de chamada.\n");
+        }   
+       
+    }else{
+        printf("[Erro] Ja existe uma instancia do pipe chamada a correr.\n");
+        exit(0);
+    }
     pthread_t tlogin;
-    pthread_t enviarmsg;
 
     int res_login = pthread_create( &tlogin, NULL, recebelogins, NULL);
-    int res_enviarmensagem = pthread_create( &enviarmsg, NULL, enviarmensagens, NULL);
 
     
    

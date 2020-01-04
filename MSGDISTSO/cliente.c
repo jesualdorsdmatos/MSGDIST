@@ -1,11 +1,62 @@
 #include "geraldefinc.h"
 #include "cliente_default.h"
+#include "gestor_default.h"
 #include <ncurses.h>
 #include <stdio.h>
 #include <string.h>
 cli_dados dados;
 msg_cli msg;
+subs lista;
 int linha=1,coluna=0;
+atendercli chamar;
+WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic;
+
+
+
+void lertopics(){
+  int x,y;
+getmaxyx(menu,x,y);
+  mvwprintw(menu,17,y/2,"teste2");
+wrefresh(menu);
+chamar.flag=1;
+strcpy(chamar.nome_pipe_escrita,dados.nome_pipe_escrita);
+int fd_flag=open(PIPE_CHAMADA,O_WRONLY);
+write(fd_flag,&chamar,sizeof(atendercli));
+close(fd_flag);
+/*******************/
+
+
+int b=1,n=0;
+getmaxyx(menu,x,y);
+int fd_mensagem=open(dados.nome_pipe_escrita,O_RDONLY);
+werase(menu);
+wrefresh(menu);
+do{
+  
+n=read(fd_mensagem,&lista,sizeof(subs));
+ 
+if(n>0){
+  mvwprintw(menu,3+b,y/2-(strlen(lista.topicos)),"Topics nº%d %s",b,lista.topicos);
+wrefresh(menu);
+b++;
+}
+}while(n>0);
+mvwprintw(menu,17,y/2,"teste2");
+wrefresh(menu);
+close(fd_mensagem);
+} 
+
+
+
+void menuimprimir(){
+  int x,y;
+getmaxyx(menu,x,y);
+  mvwprintw(menu,5,y/2-(strlen("Consultar lista de Topics------------------>"))/2,"Consultar lista de Topics------------------>");
+  mvwprintw(menu,6,y/2-(strlen("Consultar lista de Titulos----------------->"))/2,"Consultar lista de Titulos----------------->");
+  mvwprintw(menu,7,y/2-(strlen("Consultar lista de Mensagens--------------->"))/2,"Consultar lista de Mensagens--------------->");
+  mvwprintw(menu,8,y/2-(strlen("Subscrever/Cancelar subscricao de um topic->"))/2,"Subscrever/Cancelar subscricao de um topic->");
+wrefresh(menu);
+}
 
 
 void iniciarncurses(){
@@ -72,6 +123,7 @@ msg.ident=getpid();
 strcpy(msg.user,dados.username);
 fd_servidor=open(SERV_PIPE,O_RDWR);
 write(fd_servidor,&dados,sizeof(cli_dados));
+close(fd_servidor);
 do{
 int fd_cliente=open(dados.nome_pipe_leitura,O_RDONLY);
 
@@ -89,7 +141,6 @@ refresh();
 int main(int argc, char** argv) {
 int input1,input2;
 int tecla;
-  WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic;
   iniciarncurses();
   limpar=newwin(0,0,0,0);
 int x,y;
@@ -121,11 +172,7 @@ getmaxyx(limpar,x,y);
   mvwprintw(limpar,4,0,"INDIQUE A MENSAGEM:");
   mvwprintw(limpar,0,y/2,"MENU:");
   mvwprintw(limpar,x-2,0,"Deseja gravar? Sim=1|Nao=0:");
-  mvwprintw(menu,5,y/4-(strlen("Consultar lista de Topics------------------>"))/2,"Consultar lista de Topics------------------>");
-  mvwprintw(menu,6,y/4-(strlen("Consultar lista de Titulos----------------->"))/2,"Consultar lista de Titulos----------------->");
-  mvwprintw(menu,7,y/4-(strlen("Consultar lista de Mensagens--------------->"))/2,"Consultar lista de Mensagens--------------->");
-  mvwprintw(menu,8,y/4-(strlen("Subscrever/Cancelar subscricao de um topic->"))/2,"Subscrever/Cancelar subscricao de um topic->");
-
+  menuimprimir();
   wrefresh(menu);
   wrefresh(limpar);
   wbkgd(titulo,COLOR_PAIR(2));
@@ -204,6 +251,7 @@ if(linha<x-2)
 case ENTER:
   mvwprintw(limpar,x-1,0,"                                        ");
     wrefresh(limpar);
+    move(linha,coluna);
 if(linha==1)
 wscanw(topic," %[^\n]",msg.topico);
 if(linha==3)
@@ -213,19 +261,8 @@ wscanw(mensagem," %[^\n]",msg.corpo);
 if(coluna>=(y/2)){
 if(linha==6){
 move(linha,coluna);
-int fd_mensagem=open(dados.nome_pipe_escrita,O_RDONLY);
-int n=read(fd_mensagem,&msg,sizeof(msg_cli));
-
-  mvwprintw(menu,5,y/4-(strlen(msg.topico)),"%s",msg.topico);
-
-
-
-
+lertopics();
 }
-;
-
-
-
 }
 
 if(linha==x-2)

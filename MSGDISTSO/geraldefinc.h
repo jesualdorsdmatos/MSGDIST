@@ -33,6 +33,7 @@
 #define MAXNOTD 10
 #define WORSNOTD  "pal_bad.txt"
 #define SERV_PIPE "pipe_servidor"
+#define PIPE_CHAMADA "pipe_chamada"
 #define PIPE_CLI_LEITURA "cli_leitura_%d"
 #define PIPE_CLI_ESCRITA "cli_escrita_%d"
 // Estrutura responsável por armazenar os dados de um cliente.
@@ -54,5 +55,10 @@ typedef struct msg_cli{
     int duracao;
     int total;
 } msg_cli;
+
+typedef struct atender{
+    int flag;
+    char nome_pipe_escrita[MAX_USER];
+}atendercli;
 
 #endif /* GERALDEFINC_H */
