@@ -12,9 +12,60 @@ int linha=1,coluna=0;
 atendercli chamar;
 WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic,*comandos;
 
+/****************/
+
+void lermensagem(){
+  int m=0;
+int x,y;
+getmaxyx(menu,x,y);
+mvwprintw(menu,x-1,0,"Indique qual é o titulo no comando.");
+move(linha,coluna);
+refresh();
+wrefresh(menu);
+wscanw(comandos," %[^\n]",comando);
+
+for ( m = 0; m < strlen(comando); m++)
+comando[m] = toupper(comando[m]);
+werase(comandos);
+wrefresh(comandos);
+
+chamar.flag=3;
+strcpy(chamar.titulo,comando);
+strcpy(chamar.nome_pipe_escrita,dados.nome_pipe_escrita);
+int fd_flag=open(PIPE_CHAMADA,O_WRONLY);
+write(fd_flag,&chamar,sizeof(atendercli));
+close(fd_flag);
+
+/*******************/
+
+int b=1,n=0;
+getmaxyx(menu,x,y);
+int fd_mensagem=open(dados.nome_pipe_escrita,O_RDONLY);
+werase(menu);
+wrefresh(menu);
+
+n=read(fd_mensagem,&tudo,sizeof(msg_cli));
+wprintw(topic,"%s",tudo.topico);
+wrefresh(topic);
+wprintw(titulo,"%s",tudo.titulo);
+wrefresh(titulo);
+wprintw(mensagem,"%s",tudo.corpo);
+wrefresh(mensagem);
+
+ mvwprintw(menu,3+b,y/2-(strlen("COMANDO:[SAIR],para voltar atrás."))/2,"COMANDO:[SAIR],para voltar atrás.");
+wrefresh(menu);
+close(fd_mensagem);
+} 
+
+
+
+
+
+
+/************/
+
 void lertitulos(){
   int m=0;
-lertopics();
 int x,y;
 getmaxyx(menu,x,y);
 mvwprintw(menu,x-1,0,"Indique qual é o Topico no comando.");
@@ -324,7 +375,17 @@ wrefresh(menu);
 if(strcmp(comando,"OP2")==0){
 werase(menu);
 wrefresh(menu);
+lertopics();
 lertitulos();
+
+}
+
+if(strcmp(comando,"OP3")==0){
+  werase(menu);
+wrefresh(menu);
+lertopics();
+lertitulos();
+lermensagem();
 
 }
 
@@ -332,6 +393,12 @@ if(strcmp(comando,"SAIR")==0){
   werase(menu);
   wrefresh(menu);
   menuimprimir();
+    werase(topic);
+  wrefresh(topic);
+  werase(titulo);
+  wrefresh(titulo);
+  werase(mensagem);
+  wrefresh(mensagem);
 
 
 }

@@ -256,7 +256,7 @@ void * recebelogins(){
 
 
 void * enviartopics(){
-    int fd_topics;
+    int fd_topics,m=0;
     do{
 
    int i=0,j=0;
@@ -291,6 +291,21 @@ fflush(stdout);
 
         }
         close(fd_topics);
+        }
+
+        if(atender.flag==3){
+            
+            fd_topics=open(atender.nome_pipe_escrita,O_WRONLY);
+            for(j=0;j<nMensagem;j++){
+
+        for ( m = 0; m < strlen(mensagem[j].titulo); m++)
+        mensagem[j].titulo[m] = toupper(mensagem[j].titulo[m]);
+                if(strcmp(mensagem[j].titulo,atender.titulo)==0){
+                 write(fd_topics,&mensagem[j],sizeof(msg_cli));
+  
+                }
+            }
+            close(fd_topics);
         }
          
         atender.flag=0;

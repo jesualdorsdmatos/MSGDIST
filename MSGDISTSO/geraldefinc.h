@@ -59,6 +59,8 @@ typedef struct msg_cli{
 typedef struct atender{
     int flag;
     char nome_pipe_escrita[MAX_USER];
+    char titulo[MAX_TITULO];
+    char topico[MAX_TOPIC];
 }atendercli;
 
 #endif /* GERALDEFINC_H */
