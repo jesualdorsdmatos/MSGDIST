@@ -10,7 +10,7 @@ int n_linhas,n_colunas;
 }Config_Tab;
 
 
-
-
+void lertopics();
+void lertitulos();
 #endif /* CLIENTE_DEFAULT_H */
 

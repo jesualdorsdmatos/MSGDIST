@@ -33,6 +33,7 @@ void acrescentaMensagagem(msg_cli m){
                  printf("Erro a  alocar  memoria para o vetor das mensagens");
              }else{
                  temp->total=nMensagem;
+                 temp->duracao=10;
             mensagem = temp;     
             mensagem[nMensagem] = m;
             acrescentartopic(mensagem[nMensagem]);
@@ -45,6 +46,7 @@ void acrescentaMensagagem(msg_cli m){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
                  temp->total=nMensagem;
+                 temp->duracao=10;
              mensagem=temp;
               mensagem[nMensagem] = m;
             acrescentartopic(mensagem[nMensagem]);
@@ -100,7 +102,6 @@ void acrescentartopic (msg_cli informacao){
             listatopics = temp;     
             strcpy(listatopics[nTopics].topicos,informacao.topico);
            nTopics++;
-        listatopics[nTopics].total=nTopics;
 
           
           }
@@ -112,7 +113,6 @@ void acrescentartopic (msg_cli informacao){
              listatopics=temp;
               strcpy(listatopics[nTopics].topicos,informacao.topico);
              nTopics++;
-                     listatopics[nTopics].total=nTopics;
 
          }
         }
@@ -258,39 +258,43 @@ void * recebelogins(){
 void * enviartopics(){
     int fd_topics;
     do{
-        sleep(1);
-      printf("iniciothread\n");
 
    int i=0,j=0;
     int r=0;
     atendercli atender;
-    printf("aqui\n");
-    fflush(stdout);
    
-    printf("a espera da flag:%d\n",atender.flag);
 fflush(stdout);
     int fd_flags=open(PIPE_CHAMADA,O_RDONLY);
     read(fd_flags,&atender,sizeof(atendercli));
-        printf("a espera de clientes\n");
     close(fd_flags);
     
     if(atender.flag==1){
             fd_topics=open(atender.nome_pipe_escrita,O_WRONLY);
 
             for(j=0;j<nTopics;j++){
-        printf("enviar topic:%s\n",listatopics[j].topicos);
-        fflush(stdout);
+       
     write(fd_topics,&listatopics[j],sizeof(subs));
-    printf("no ciclo for\n");
+   
     }
             close(fd_topics);
 
 
     }
-      printf("fim1\n");
+       
+
+        if(atender.flag==2){
+            fd_topics=open(atender.nome_pipe_escrita,O_WRONLY);
+
+            for(j=0;j<nMensagem;j++){
+       
+    write(fd_topics,&mensagem[j],sizeof(msg_cli));
+
+        }
+        close(fd_topics);
+        }
+         
         atender.flag=0;
 }while(1);
-      printf("fim2\n");
 
 }
 

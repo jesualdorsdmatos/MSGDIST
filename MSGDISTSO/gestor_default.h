@@ -15,7 +15,6 @@ typedef struct variaveisamb{
 //Estrutura responsavel por armazenar todos os topicos atualmente existentes.
 typedef struct subscritos{
 char topicos[MAX_TOPIC];
-int total;
 }subs;
 
 //Destina-se a guardar as subscrições por tópico associada a um utiliador
