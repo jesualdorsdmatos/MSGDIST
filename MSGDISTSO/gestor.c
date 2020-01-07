@@ -76,25 +76,83 @@ void remove_spaces(char* s) {
     } while (*s++ = *d++);
 }
 
+void segementaNome(char username[] ,char * nome, char *numero){
+  int i=0;
+    int j=0, p=0;
 
-void verificaDadosCliente(cli_dados *c){
-    int i=0;
-    int j=0;
-    char numero[2]="";
-    char nome[MAX_USER]="";
-    for ( i=0; i< strlen(c->username);i++){
-    if(isdigit(c->username[i])==0){
-        nome[i]=c->username[i];
+    for ( i=0; i< strlen(username);i++){
+    if(isdigit(username[i])==0){
+        nome[j] =username[i];
+        j++;
+       nome= realloc(nome,j* sizeof(char));
     }else {
-    numero[j]= c->username[i];
-    j++;
+    numero[p]=username[i];
+    p++;
+    numero= realloc(numero, p*sizeof(char));
     }
-    }
-    char *num=strtok(numero," ");
-    char *nom=strtok(nome," ");
-
-
+   
 }
+}
+
+bool verificaDadosCliente(cli_dados *c){
+    int i=0,numat, num;
+    int conta=0;
+    int maior=0;
+    char *str;
+    char *numero=(char*) malloc(sizeof(char));
+    char *nome=(char*) malloc(sizeof(char));
+   segementaNome(c->username,nome,numero);
+
+       num= atoi(numero);
+   char *atualizanum;
+   char *atualizanome;
+for( int i; i< nUsers;i++){
+    printf("estou dentro do ciclo");
+atualizanum=(char*) malloc(sizeof(char));
+atualizanome=(char*) malloc(sizeof(char));
+
+   segementaNome(clientes[i].username,atualizanome,atualizanum);
+printf("nome %s", clientes[i].username);
+printf("intoduzido:%s",nome);
+    if( strcmp(nome,atualizanome)==0){// caso o nome seja o mesmo
+    printf("sao iguais");
+    conta ++;
+      numat= atoi(atualizanum);
+    if(maior < numat){
+        maior =numat;
+    }
+    }
+  
+ free(atualizanome);
+free(atualizanum); 
+        }
+
+
+/*
+maior +=1;
+    str = malloc(strlen(nome)*sizeof(char));//+1* sizeof(char));
+     if(maior !=0 && conta !=0){
+         int l=0;
+        for(  l=0; l< strlen(nome); l++)
+        str[l] = nome[l];
+    
+        //str[l+1]=  maior;
+        for(int k=0; k< strlen(str); i++)
+        c->username[k] = str[k];
+  printf("maior-> %d   \n", maior);  
+        return true;
+    }
+free(str);
+     free(numero);
+    free(nome);
+
+
+    //printf("user %s",c->username);
+        return false;
+*/
+}
+
+
 
 
 int verificaexisteTopico(char nome[]){
@@ -156,7 +214,7 @@ void acrescentaCliente (cli_dados c){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              clientes=temp;
-             verificaDadosCliente(&c);
+             //verificaDadosCliente(&c);
               clientes[nUsers] = c;
              nUsers++;
          }
@@ -328,11 +386,15 @@ if(res!=0){
 
    }while(1);
 }
+//NESTA FUNÇÃO  CHAMDO O METODO DE VERIFICAR
 void * recebelogins(){
    do{
      cli_dados c;
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
+   printf("antes da funcao");
+//verificaDadosCliente(&c); 
+printf("depois da funcao");
    acrescentaCliente(c);
    if(c.estado!=1){
     if(mkfifo(c.nome_pipe_leitura,0600)==-1){
@@ -341,8 +403,7 @@ void * recebelogins(){
      if(mkfifo(c.nome_pipe_escrita,0600)==-1){
         printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
     }
-    
-    int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
+       int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
     c.estado=1;
     close(fd_serv);
     write(fd_cliente,&c,sizeof(cli_dados));
