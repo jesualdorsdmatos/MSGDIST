@@ -476,6 +476,24 @@ fflush(stdout);
 }while(1);
 
 }
+void listautilizadores(){
+for (int i=0; i< nUsers;i++){
+    printf("Nome: %s\n",clientes[i].username);
+}
+}
+void listamensagens(){
+int i=0;
+for( i=0; i< nMensagem; i++){
+printf("Mensagem %d\n", mensagem[i].ident);
+printf("Titulo:  %s\n",mensagem[i].titulo);
+printf("Topico:  %s\n",mensagem[i].topico);
+printf("Corpo:   %s\n",mensagem[i].corpo);
+}
+
+
+}
+
+
 
 int main(int argc, char *argv)
 {
@@ -575,12 +593,19 @@ int main(int argc, char *argv)
             }
             else if (strcmp(b.comando, "USERS") == 0)
             {
+                printf("\nUtilizadores EXISTENTES:\n");
+                listautilizadores();
             }
             else if (strcmp(b.comando, "TOPICS") == 0)
-            {   printf("\nTOPICS EXISTENTES:\n");
+            {   if(nTopics==0){
+                printf("\nNao existem topicos armazenados\n");
+
+                }else{
+                printf("\nTOPICS EXISTENTES:\n");
                 int i=0;
                 for(i;i<nTopics;i++){
                 printf("Topic:%s\n",listatopics[i].topicos);
+                }
                 }
             }
             else if (strcmp(b.comando, "HELP") == 0)
@@ -589,6 +614,13 @@ int main(int argc, char *argv)
             }
             else if (strcmp(b.comando, "MSG") == 0)
             {
+                if(nMensagem==0){
+                    printf("\nNao existem mensagens armazenadas\n");
+                }else{
+                    printf("\nMENSAGEM EXISTENTES:\n");
+                listamensagens();
+                }
+
             }
             else if (strcmp(b.comando, "MENSAGEM") == 0)
             {

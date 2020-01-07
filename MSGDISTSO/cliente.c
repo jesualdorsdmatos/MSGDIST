@@ -243,6 +243,10 @@ int main(int argc, char** argv) {
 int m;
 int input1,input2;
 int tecla;
+ if(access(SERV_PIPE,F_OK)!=0){
+        perror("[Erro] O servidor nao esta a correr.\n");
+        exit(0);
+    }
   iniciarncurses();
   limpar=newwin(0,0,0,0);
 int x,y;
