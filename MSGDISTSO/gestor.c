@@ -6,10 +6,17 @@
     msg_cli *mensagem=NULL;
     cli_dados * clientes=NULL;
     subs *listatopics=NULL;
-
     int nMensagem=0;
     int nUsers=0;
     int nTopics=0;
+    void atualizaident(){
+int i=0;
+for(i=0; i< nMensagem; i++){
+mensagem[i].ident=i;
+
+}
+
+}
     void imprimirin()
 {
     printf("************************************************\n");
@@ -32,30 +39,31 @@ void acrescentaMensagagem(msg_cli m){
       if(temp==NULL){
                  printf("Erro a  alocar  memoria para o vetor das mensagens");
              }else{
-                 temp->total=nMensagem;
-                 temp->duracao=10;
+            
+                   m.total=nMensagem;
+                 m.duracao=50;
             mensagem = temp;     
             mensagem[nMensagem] = m;
             acrescentartopic(mensagem[nMensagem]);
-
            nMensagem++;
+        atualizaident();
           }
         } else {
              temp = realloc(mensagem, ( nMensagem+ 1) * sizeof(msg_cli));
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
-                 temp->total=nMensagem;
-                 temp->duracao=10;
+             
+                 m.total=nMensagem;
+                 m.duracao=50;
              mensagem=temp;
               mensagem[nMensagem] = m;
             acrescentartopic(mensagem[nMensagem]);
              nMensagem++;
-             
-
-         
+             atualizaident(); 
          }
         }
+        
          
 }
 
@@ -89,28 +97,40 @@ void verificaDadosCliente(cli_dados *c){
 }
 
 
-
+int verificaexisteTopico(char nome[]){
+int i=0;
+    for(i=0; i< nTopics; i++){
+    if (strcmp(nome,listatopics[i].topicos)==0){
+        return 0;
+        }
+    }
+return 1;
+}
 
 
 void acrescentartopic (msg_cli informacao){
     subs *temp;
+    int res;
+     res=verificaexisteTopico(informacao.topico);
   if (listatopics == NULL) {
   temp = (subs*) malloc(sizeof(subs) * 1);
       if(temp==NULL){
                  printf("Erro a  alocar  memoria para o vetor das mensagens");
              }else{
             listatopics = temp;     
+        
             strcpy(listatopics[nTopics].topicos,informacao.topico);
            nTopics++;
 
           
           }
-        } else {        
+        } else if(res ==1) {        
              temp = realloc(listatopics, ( nTopics + 1) * sizeof(subs));
              if(temp==NULL){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              listatopics=temp;
+            
               strcpy(listatopics[nTopics].topicos,informacao.topico);
              nTopics++;
 
@@ -196,6 +216,7 @@ void encerrar(int pidfilho)
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
     unlink(SERV_PIPE);
+    unlink(PIPE_CHAMADA);
     exit(0);
 }
 
@@ -213,14 +234,96 @@ void help()
     printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
     printf("Comando:Prune -> Eliminar Topicos sem conteudo.\n");
 }
+int verificaUnicoTopico(char topico[]){
+int i=0, conta=0;
+for(i=0; i< nMensagem;i++){
+    if(strcmp(mensagem[i].topico,topico)==0){
+        conta++;
+    }
+}
+return conta;
+}
+void removetopico(char topico[]){
+   int ind=0;
+    for(int i=0; i< nTopics; i++){
+        if(strcmp(listatopics[i].topicos, topico)==0){
+
+    subs *temp = malloc((nTopics - 1) * sizeof(subs)); // allocate an array with a size 1 less than the current one
+
+    if (ind != 0)
+        memcpy(temp, listatopics, ind * sizeof(subs)); // copy everything BEFORE the index
+
+    if (ind != (nTopics - 1))
+        memcpy(temp+ind, listatopics+ind+1, (nTopics - ind - 1) * sizeof(subs)); // copy everything AFTER the index
+
+    listatopics= temp;
+    nTopics--;
+    free(temp);
+
+
+        }
+    }
+
+
+}
+void removeMensagem( int id){
+
+  int ind=0;
+    for(int i=0; i< nMensagem; i++){
+        if(mensagem[i].ident==id){
+
+    msg_cli*temp = malloc((nMensagem - 1) * sizeof(msg_cli)); // allocate an array with a size 1 less than the current one
+
+    if (i != 0)
+        memcpy(temp, mensagem, i * sizeof(msg_cli)); // copy everything BEFORE the index
+
+    if (i != (nMensagem - 1))
+        memcpy(temp+i, mensagem+i+1, (nMensagem - i - 1) * sizeof(msg_cli)); // copy everything AFTER the index
+
+    mensagem= temp;
+    nMensagem--;
+        }
+    }
+
+}
+
+
+//
+void * DecrementaTempo(void * ms){
+    msg_cli *msg;
+     msg =(msg_cli*) ms;
+    
+    int unico;
+    printf("entrei thread a decrementar\n");
+    printf("tempo %d", msg->duracao);
+    sleep(msg->duracao);
+    unico = verificaUnicoTopico(msg->topico);
+
+       if(unico==1){
+        removetopico(msg->topico);
+       }
+        removeMensagem(msg->ident);
+        atualizaident();
+    
+}
 
 void * recebermensagens(void * nomepipe){
+
+
     do{
       int fd_cliente=open(nomepipe,O_RDONLY);
       msg_cli m;
        int n=read(fd_cliente,&m,sizeof(msg_cli));
         if(n!=-1){
                acrescentaMensagagem(m);
+        pthread_t t_msg;        
+        printf("Thread Recebe Mensagens -> tempo %d",mensagem[nMensagem-1].duracao);
+     
+     int res = pthread_create( &t_msg, NULL, DecrementaTempo, (void*) &mensagem[nMensagem-1]);
+     
+if(res!=0){
+    printf("Erro a  lancar a thread para mensagem com o titulo %s", m.titulo);
+        }
          }
 
    }while(1);
