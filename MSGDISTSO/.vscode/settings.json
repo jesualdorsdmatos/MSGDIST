@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "geraldefinc.h": "c",
-        "gestor_default.h": "c"
+        "gestor_default.h": "c",
+        "signal.h": "c",
+        "cliente_default.h": "c"
     }
 }

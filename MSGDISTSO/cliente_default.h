@@ -13,5 +13,7 @@ int n_linhas,n_colunas;
 void lertopics();
 void lertitulos();
 void lermensagem();
+void subscrever();
+void sair();
 #endif /* CLIENTE_DEFAULT_H */
 

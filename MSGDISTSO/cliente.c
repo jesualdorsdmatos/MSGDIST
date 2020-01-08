@@ -12,6 +12,53 @@ int linha=1,coluna=0;
 atendercli chamar;
 WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic,*comandos;
 
+
+
+/*********************/
+
+
+void sinall(int s){
+  int x,y;
+getmaxyx(menu,x,y);
+mvwprintw(menu,x-1,0,"O servidor encerrou!");
+wrefresh(menu);
+sleep(10);
+unlink(dados.nome_pipe_escrita);
+unlink(dados.nome_pipe_leitura);
+sair();
+}
+
+void subscrever(){
+  int m=0;
+int x,y;
+getmaxyx(menu,x,y);
+mvwprintw(menu,x-1,0,"Indique qual é o Topico para subscrever no comando.");
+move(linha,coluna);
+refresh();
+wrefresh(menu);
+wscanw(comandos," %[^\n]",comando);
+
+for ( m = 0; m < strlen(comando); m++)
+comando[m] = toupper(comando[m]);
+werase(comandos);
+wrefresh(comandos);
+
+chamar.flag=4;
+strcpy(chamar.topico,comando);
+strcpy(chamar.nome_pipe_escrita,dados.nome_pipe_escrita);
+int fd_flag=open(PIPE_CHAMADA,O_WRONLY);
+write(fd_flag,&chamar,sizeof(atendercli));
+close(fd_flag);
+
+
+} 
+
+
+
+
+
+
+
 /****************/
 
 void lermensagem(){
@@ -243,6 +290,10 @@ int main(int argc, char** argv) {
 int m;
 int input1,input2;
 int tecla;
+
+signal(SIGUSR1,sinall);
+
+
  if(access(SERV_PIPE,F_OK)!=0){
         perror("[Erro] O servidor nao esta a correr.\n");
         exit(0);
@@ -392,7 +443,13 @@ lertitulos();
 lermensagem();
 
 }
+if(strcmp(comando,"OP4")==0){
+  werase(menu);
+wrefresh(menu);
+lertopics();
+subscrever();
 
+}
 if(strcmp(comando,"SAIR")==0){
   werase(menu);
   wrefresh(menu);

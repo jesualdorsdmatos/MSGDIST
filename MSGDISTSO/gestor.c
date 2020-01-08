@@ -1,18 +1,21 @@
 #include "gestor_default.h"
 #include "geraldefinc.h"
     pthread_t lermensagem;
-    pthread_t enviartop;
+    pthread_t gestorc;
 
     msg_cli *mensagem=NULL;
     cli_dados * clientes=NULL;
     subs *listatopics=NULL;
+    utsub *subscricoes=NULL;
     int nMensagem=0;
     int nUsers=0;
     int nTopics=0;
+    int nSubs=0;
     void atualizaident(){
 int i=0;
 for(i=0; i< nMensagem; i++){
 mensagem[i].ident=i;
+
 
 }
 
@@ -32,6 +35,52 @@ void imprimirfi()
     printf("**       Jesualdo Matos/Francisco Silva        **\n");
     printf("*************************************************\n");
 }
+
+
+
+
+void subsfunc(atendercli cli){
+    utsub *temp;
+    int res;
+  if (subscricoes == NULL) {
+  temp = (utsub*) malloc(sizeof(utsub) * 1);
+      if(temp==NULL){
+                 printf("Erro a  alocar  memoria para o vetor das mensagens");
+             }else{
+            subscricoes = temp;     
+        
+            strcpy(subscricoes[nSubs].nome_pipe_escrita,cli.nome_pipe_escrita);
+                        strcpy(subscricoes[nSubs].topicos,cli.topico);
+
+           nSubs++;
+
+          
+          }
+        } else if(res ==1) {        
+             temp = realloc(subscricoes, ( nSubs + 1) * sizeof(utsub));
+             if(temp==NULL){
+                 printf("Erro a  realocar memoria para o vetor das mensagens");
+             }else{
+             subscricoes=temp;
+            
+                  strcpy(subscricoes[nSubs].nome_pipe_escrita,cli.nome_pipe_escrita);
+                        strcpy(subscricoes[nSubs].topicos,cli.topico);
+                nSubs++;
+
+         }
+        }
+
+}
+
+
+
+
+
+
+
+
+
+
 void acrescentaMensagagem(msg_cli m){
     msg_cli *temp;
   if (mensagem == NULL) {
@@ -166,6 +215,10 @@ return 1;
 }
 
 
+
+
+
+
 void acrescentartopic (msg_cli informacao){
     subs *temp;
     int res;
@@ -269,7 +322,11 @@ varamb lervarambiente()
 }
 
 void encerrar(int pidfilho)
-{
+{   int i;
+    for(i=0;i<nUsers;i++){
+        printf("PID %d",clientes[i].pid);
+        kill(clientes[i].pid,SIGUSR1);
+    }
     kill(pidfilho,SIGUSR2);
     printf("Gestor encerrado com sucesso.\n");
     imprimirfi();
@@ -409,7 +466,7 @@ printf("depois da funcao");
     write(fd_cliente,&c,sizeof(cli_dados));
     close(fd_cliente);  
      int res_uti = pthread_create( &lermensagem, NULL, recebermensagens,(void*)&c.nome_pipe_leitura);  
-    int res_topicsenviar = pthread_create( &enviartop, NULL, enviartopics, NULL);
+    int res_topicsenviar = pthread_create( &gestorc, NULL, gestorcliente, NULL);
     
    }
     }while(1);
@@ -419,7 +476,7 @@ printf("depois da funcao");
 
 
 
-void * enviartopics(){
+void * gestorcliente(){
     int fd_topics,m=0;
     do{
 
@@ -470,6 +527,11 @@ fflush(stdout);
                 }
             }
             close(fd_topics);
+        }
+
+        if(atender.flag==4){
+          subsfunc(atender);  
+          printf("topic subscrito foi %s \n pelo %s\n",subscricoes[0].topicos,subscricoes[0].nome_pipe_escrita);
         }
          
         atender.flag=0;

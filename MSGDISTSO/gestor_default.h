@@ -19,8 +19,8 @@ char topicos[MAX_TOPIC];
 
 //Destina-se a guardar as subscrições por tópico associada a um utiliador
 typedef struct util_subsc{
-cli_dados cliente;
- subs sub[MAX];
+char topicos[MAX_TOPIC];
+ char nome_pipe_escrita[MAX_USER];
 }utsub;
 // Estruturas para os comandos.
 typedef struct cmdguardar{
@@ -35,5 +35,6 @@ varamb lervarambiente(); //Função responsável por ler as variavéis de ambien
 void encerrar(int pidfilho);//Função associada ao comando shutdown responsável por encerrar o verificador corretamente.
 void help();//Função associada ao comando help onde elucida o utilizador sobre o funcionamento da consola.
 void acrescentartopic (msg_cli c);
-void * enviartopics();
+void * gestorcliente();
+void subsfunc(atendercli cli);
 #endif /* GESTOR_DEFAULT_h */
