@@ -10,10 +10,7 @@ varamb var;
     int nMensagem=0;
     int nUsers=0;
     int nTopics=0;
-    int pipe1[2];
       int nSubs=0;
-    int pipe2[2], filtro = 0;
-
 void atualizaident(){
     int i=0;
         for(i=0; i< nMensagem; i++){
@@ -129,60 +126,6 @@ void remove_spaces(char* s) {
     } while (*s++ = *d++);
 }
 
-void segementaNome(char username[] ,char * nome, char *numero){
-  int i=0;
-    int j=0, p=0;
-
-    for ( i=0; i< strlen(username);i++){
-    if(isdigit(username[i])==0){
-        nome[j] =username[i];
-        j++;
-       nome= realloc(nome,j* sizeof(char));
-    }else {
-    numero[p]=username[i];
-    p++;
-    numero= realloc(numero, p*sizeof(char));
-    }
-    }
-    p++;
-    j++;
-    nome= realloc(nome,j* sizeof(char));
-    numero= realloc(numero, p*sizeof(char));
-nome[p]='\0';
-numero[p]='\0';
-
-}
-
-bool verificaDadosCliente(cli_dados *c){
-    int i=0,numat, num;
-    int conta=0;
-    int maior=0;
-    char str[20];
-
-    char *numero=(char*) malloc(sizeof(char));
-    char *nome=(char*) malloc(sizeof(char));
-   segementaNome(c->username,nome,numero);
-num= atoi(numero);
-
-
-for( int i; i< nUsers;i++){
-sscanf(clientes[i].username,"strlen(nome)%s%d",str,&numat);
-printf("%d", numat);
-puts(str);
-}
-
-}
-
-
-
-
-
-
-
-
-
-
-
 void acrescentartopic (msg_cli informacao){
     subs *temp;
     int res;
@@ -288,7 +231,6 @@ varamb lervarambiente()
 void encerrar(int pidfilho)
 {   int i;
     for(i=0;i<nUsers;i++){
-        printf("PID %d",clientes[i].pid);
         kill(clientes[i].pid,SIGUSR1);
     }
     kill(pidfilho,SIGUSR2);
@@ -446,8 +388,6 @@ void * recebelogins(){
    read(fd_serv,&c,sizeof(cli_dados));
 
    acrescentaCliente(c);
-   verificaDadosCliente(&c); 
-
    if(c.estado!=1){
     if(mkfifo(c.nome_pipe_leitura,0600)==-1){
         printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
@@ -603,38 +543,7 @@ for(i=0; i<nMensagem;i++){
         printf("Topico:  %s\n",mensagem[i].topico);
         printf("Corpo:   %s\n",mensagem[i].corpo);
     }
-
     }
-
-}
-void  verificamsg(){
-char buffer[3];
-int numerx;
-     char pal[]="jesualdo manuel maria ";
-     filtro=1;
-     printf("%s",pal);
-                if (filtro == 1)
-                {
-                    close(pipe1[READ]);
-                    close(pipe2[WRITE]);
-                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
-                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
-
-                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
-                        fprintf(stderr, "[ERRO] Envio do \\n \n");
-
-                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
-                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
-
-                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
-                    if (nbytes == -1)
-                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
-                    else
-                        numerx = atoi(buffer);
-                    
-
-                    printf("Numero de palavras invalidas:%d\n", numerx);
-                }
 }
 
 
@@ -646,6 +555,11 @@ int main(int argc, char *argv)
     b.argumento = NULL;     
     int pidfilho = 0;
     int restfork;
+     char buffer[3];
+     int numerx;
+    int pipe1[2];
+    int pipe2[2];
+    int filter = 0;
   
     imprimirin();
   var = lervarambiente();
@@ -699,6 +613,7 @@ if (pipe(pipe1) == -1)
         pidfilho = restfork;
         while (1)
         {
+           
             printf("Intoduza um comando: ");
             scanf(" %[^\n]", cmd);
             fflush(stdin);
@@ -720,12 +635,12 @@ if (pipe(pipe1) == -1)
                 if (strcmp(b.argumento, "ON") == 0)
                 {
                     printf("Filtro Status[ON].\n");
-                    filtro = 1;
+                    filter = 1;
                 }
                 else if (strcmp(b.argumento, "OFF") == 0)
                 {
                     printf("Filtro Status[OFF].\n");
-                    filtro = 0;
+                    filter = 0;
                 }
                 else
                     printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n", b.argumento);
@@ -745,6 +660,37 @@ if (pipe(pipe1) == -1)
                 for(i;i<nTopics;i++){
                 printf("Topic:%s\n",listatopics[i].topicos);
                 }
+                }
+            }
+              else if (strcmp(b.comando, "MENSAGEM") == 0)
+            {
+                if (filter == 0)
+                {
+                    printf("Filtro encontra-se desativo, ativar,[filter on].\n");
+                }
+                printf("Introduz uma mensagem:");
+                getchar();
+                fgets(pal, sizeof(pal), stdin);
+                if (filter == 1)
+                {
+                    close(pipe1[READ]);
+                    close(pipe2[WRITE]);
+                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
+                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
+
+                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
+                        fprintf(stderr, "[ERRO] Envio do \\n \n");
+
+                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
+                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
+
+                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
+                    if (nbytes == errno)
+                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
+                    else
+                        numerx = atoi(buffer);
+
+                    printf("Numero de palavras invalidas:%d\n", numerx);
                 }
             }
             else if (strcmp(b.comando, "HELP") == 0)

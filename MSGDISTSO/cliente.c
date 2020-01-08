@@ -281,14 +281,8 @@ refresh();
 void login( WINDOW *janelalogin,WINDOW *limpar){
   int n=-1;
   int fd_cliente,fd_servidor;
-wbkgd(janelalogin,COLOR_PAIR(3));
 int x,y;
 getmaxyx(limpar,x,y);
-mvprintw(x/2-1,y/2-(strlen("Indique o seu username")/2),"Indique o seu username:");
-refresh();
-echo();
-wrefresh(janelalogin);
-wscanw(janelalogin,"%s",dados.username);
 dados.pid= getpid();
 dados.estado=0;
 sprintf(dados.nome_pipe_escrita,PIPE_CLI_ESCRITA,dados.pid);
@@ -321,8 +315,17 @@ int m;
 int input1,input2;
 int tecla;
 
-signal(SIGUSR1,sinall);
 
+if (argc>=1){
+for(int i=0; i<strlen(argv[1]);i++)
+  dados.username[i]=argv[1][i];
+
+}else
+{
+  printf("E necessario especificar o nome do cliente\n");
+  exit(0);
+}
+signal(SIGUSR1,sinall);
 
  if(access(SERV_PIPE,F_OK)!=0){
         perror("[Erro] O servidor nao esta a correr.\n");
