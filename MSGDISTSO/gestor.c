@@ -9,12 +9,16 @@
     int nMensagem=0;
     int nUsers=0;
     int nTopics=0;
-    void atualizaident(){
-int i=0;
-for(i=0; i< nMensagem; i++){
-mensagem[i].ident=i;
+    int pipe1[2];
+  
+    int pipe2[2], filtro = 0;
 
-}
+void atualizaident(){
+    int i=0;
+        for(i=0; i< nMensagem; i++){
+        mensagem[i].ident=i;
+
+        }
 
 }
     void imprimirin()
@@ -32,6 +36,35 @@ void imprimirfi()
     printf("**       Jesualdo Matos/Francisco Silva        **\n");
     printf("*************************************************\n");
 }
+
+int filtramensagem(char pal[]){
+int numerx;
+char buffer[3];
+                if (filtro == 1)
+                {
+                   
+                    close(pipe1[READ]);
+                    close(pipe2[WRITE]);
+                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
+                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
+
+                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
+                        fprintf(stderr, "[ERRO] Envio do \\n \n");
+
+                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
+                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
+                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
+                    if (nbytes == errno)
+                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
+                    else
+                        numerx = atoi(buffer);
+
+                }
+            
+
+return numerx;
+
+}
 void acrescentaMensagagem(msg_cli m){
     msg_cli *temp;
   if (mensagem == NULL) {
@@ -40,8 +73,8 @@ void acrescentaMensagagem(msg_cli m){
                  printf("Erro a  alocar  memoria para o vetor das mensagens");
              }else{
             
-                   m.total=nMensagem;
-                 m.duracao=50;
+            m.total=nMensagem;
+            m.duracao=50;
             mensagem = temp;     
             mensagem[nMensagem] = m;
             acrescentartopic(mensagem[nMensagem]);
@@ -64,7 +97,7 @@ void acrescentaMensagagem(msg_cli m){
          }
         }
         
-         
+      fprintf(stderr,"Foi adicionada uma mensagem com o id %d\n",m.ident);   
 }
 
 void remove_spaces(char* s) {
@@ -90,8 +123,8 @@ void segementaNome(char username[] ,char * nome, char *numero){
     p++;
     numero= realloc(numero, p*sizeof(char));
     }
-   
-}
+    }
+
 }
 
 bool verificaDadosCliente(cli_dados *c){
@@ -127,8 +160,6 @@ printf("intoduzido:%s",nome);
 free(atualizanum); 
         }
 
-
-/*
 maior +=1;
     str = malloc(strlen(nome)*sizeof(char));//+1* sizeof(char));
      if(maior !=0 && conta !=0){
@@ -146,10 +177,6 @@ free(str);
      free(numero);
     free(nome);
 
-
-    //printf("user %s",c->username);
-        return false;
-*/
 }
 
 
@@ -194,7 +221,7 @@ void acrescentartopic (msg_cli informacao){
 
          }
         }
-
+fprintf(stderr,"foi adicionado um novo topico com o nome %s",informacao.topico);
 }
 
 void acrescentaCliente (cli_dados c){
@@ -214,11 +241,11 @@ void acrescentaCliente (cli_dados c){
                  printf("Erro a  realocar memoria para o vetor das mensagens");
              }else{
              clientes=temp;
-             //verificaDadosCliente(&c);
               clientes[nUsers] = c;
              nUsers++;
          }
         }
+    fprintf(stderr, "Foi adicionado um cliente  com o nome %s", c.username);
 
 }
 
@@ -321,7 +348,7 @@ void removetopico(char topico[]){
 
         }
     }
-
+fprintf(stderr, "Foi removido um topico com o nome %s\n", topico);
 
 }
 void removeMensagem( int id){
@@ -342,6 +369,7 @@ void removeMensagem( int id){
     nMensagem--;
         }
     }
+    fprintf(stderr, "Foi removida uma mensagem com o id %d\n", id);
 
 }
 
@@ -352,30 +380,24 @@ void * DecrementaTempo(void * ms){
      msg =(msg_cli*) ms;
     
     int unico;
-    printf("entrei thread a decrementar\n");
-    printf("tempo %d", msg->duracao);
     sleep(msg->duracao);
-    unico = verificaUnicoTopico(msg->topico);
-
-       if(unico==1){
-        removetopico(msg->topico);
-       }
+ 
         removeMensagem(msg->ident);
         atualizaident();
     
 }
 
 void * recebermensagens(void * nomepipe){
-
+int res=0;
 
     do{
       int fd_cliente=open(nomepipe,O_RDONLY);
       msg_cli m;
        int n=read(fd_cliente,&m,sizeof(msg_cli));
         if(n!=-1){
+           
                acrescentaMensagagem(m);
         pthread_t t_msg;        
-        printf("Thread Recebe Mensagens -> tempo %d",mensagem[nMensagem-1].duracao);
      
      int res = pthread_create( &t_msg, NULL, DecrementaTempo, (void*) &mensagem[nMensagem-1]);
      
@@ -392,9 +414,8 @@ void * recebelogins(){
      cli_dados c;
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
-   printf("antes da funcao");
 //verificaDadosCliente(&c); 
-printf("depois da funcao");
+
    acrescentaCliente(c);
    if(c.estado!=1){
     if(mkfifo(c.nome_pipe_leitura,0600)==-1){
@@ -481,6 +502,18 @@ for (int i=0; i< nUsers;i++){
     printf("Nome: %s\n",clientes[i].username);
 }
 }
+void cmdPrune(){
+int unico=0;
+for(int i=0; i<nMensagem; i++){
+   unico = verificaUnicoTopico(mensagem[i].topico);
+
+       if(unico==1){
+        removetopico(mensagem[i].topico);
+    }
+     
+}
+
+}
 void listamensagens(){
 int i=0;
 for( i=0; i< nMensagem; i++){
@@ -493,18 +526,35 @@ printf("Corpo:   %s\n",mensagem[i].corpo);
 
 }
 
+void listaMensagensDeTopico( char topico[]){
+int i=0;
+char str[strlen(topico)];
+for(i=0; i<strlen(topico);i++){
+str[i]=tolower(topico[i]);
+}
+str[i]='\0';
+
+for(i=0; i<nMensagem;i++){
+    if(strcmp(str,mensagem[i].topico)==0){
+        printf("Mensagem %d\n", mensagem[i].ident);
+        printf("Titulo:  %s\n",mensagem[i].titulo);
+        printf("Topico:  %s\n",mensagem[i].topico);
+        printf("Corpo:   %s\n",mensagem[i].corpo);
+    }
+
+    }
+
+}
+
+
 
 
 int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
     cmds b;
-    char buffer[3];
-    b.argumento = NULL;
-    int pipe1[2];
-    int pipe2[2];
-    int filter = 0;
-    int numerx = 0;
+    b.argumento = NULL;   
+   
     int pidfilho = 0;
     int restfork;
   
@@ -534,7 +584,7 @@ int main(int argc, char *argv)
 
     
    
-       if (pipe(pipe1) == -1)
+if (pipe(pipe1) == -1)
     {
         fprintf(stderr, "[ERRO] Criacao pipe1\n");
         exit(1);
@@ -549,7 +599,7 @@ int main(int argc, char *argv)
     restfork = fork();
     if (restfork == 0)
     { 
-       close(pipe1[WRITE]);     // O dup2 fecha automáticamente a extremidade do pipe que não está a ser usado por exemplo o read.
+        close(pipe1[WRITE]);     // O dup2 fecha automáticamente a extremidade do pipe que não está a ser usado por exemplo o read.
        close(pipe2[READ]);
        dup2(pipe1[READ], READ);  //depois de fazer a troca dos fd's
        dup2(pipe2[WRITE], WRITE); 
@@ -557,7 +607,10 @@ int main(int argc, char *argv)
     }
     else
     {
-
+          // int res=filtramensagem("a maria tem de colocar isto a dar");
+            //  printf("%d",res);
+char buffer[3];
+int numerx;
         pidfilho = restfork;
         while (1)
         {
@@ -581,16 +634,41 @@ int main(int argc, char *argv)
                 if (strcmp(b.argumento, "ON") == 0)
                 {
                     printf("Filtro Status[ON].\n");
-                    filter = 1;
+                    filtro = 1;
                 }
                 else if (strcmp(b.argumento, "OFF") == 0)
                 {
                     printf("Filtro Status[OFF].\n");
-                    filter = 0;
+                    filtro = 0;
                 }
                 else
                     printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n", b.argumento);
+            }else if (strcmp(b.comando, "MENSAGEM") == 0)
+            {
+           
+                if (filtro == 1)
+                {
+                    close(pipe1[READ]);
+                    close(pipe2[WRITE]);
+                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
+                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
+
+                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
+                        fprintf(stderr, "[ERRO] Envio do \\n \n");
+
+                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
+                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
+
+                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
+                    if (nbytes == errno)
+                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
+                    else
+                        numerx = atoi(buffer);
+
+                    printf("Numero de palavras invalidas:%d\n", numerx);
+                }
             }
+            
             else if (strcmp(b.comando, "USERS") == 0)
             {
                 printf("\nUtilizadores EXISTENTES:\n");
@@ -622,45 +700,24 @@ int main(int argc, char *argv)
                 }
 
             }
-            else if (strcmp(b.comando, "MENSAGEM") == 0)
-            {
-                if (filter == 0)
-                {
-                    printf("Filtro encontra-se desativo, ativar,[filter on].\n");
-                }
-                printf("Introduz uma mensagem:");
-                getchar();
-                fgets(pal, sizeof(pal), stdin);
-                if (filter == 1)
-                {
-                    close(pipe1[READ]);
-                    close(pipe2[WRITE]);
-                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
-                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
+            else if(strcmp(b.comando,"TOPIC")==0 && b.argumento!=NULL){
+                printf("argumento %s", b.argumento);
+                listaMensagensDeTopico(b.argumento);
 
-                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
-                        fprintf(stderr, "[ERRO] Envio do \\n \n");
-
-                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
-                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
-
-                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
-                    if (nbytes == errno)
-                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
-                    else
-                        numerx = atoi(buffer);
-
-                    printf("Numero de palavras invalidas:%d\n", numerx);
-                }
             }
-            else if (strcmp(b.comando, "DEL") == 0 && b.argumento != NULL)
+                        else if (strcmp(b.comando, "DEL") == 0 && b.argumento != NULL)
             {
+            int id = atoi(b.argumento);
+            removeMensagem(id);
+
             }
             else if (strcmp(b.comando, "KICK") == 0 && b.argumento != NULL)
             {
+
             }
             else if (strcmp(b.comando, "PRUNE") == 0)
             {
+                cmdPrune();//falta avisar clientes
             }
             else
             {
