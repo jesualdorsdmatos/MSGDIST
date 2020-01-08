@@ -11,6 +11,7 @@ subs lista;
 int linha=1,coluna=0;
 atendercli chamar;
 WINDOW *janelalogin,*intiwin,*limpar,*menu,*titulo,*topic,*mensagem,*listopic,*comandos;
+int pidServer;
 
 
 
@@ -27,6 +28,29 @@ unlink(dados.nome_pipe_escrita);
 unlink(dados.nome_pipe_leitura);
 sair();
 }
+
+  
+ void EncerraAplicacao(){
+  int x,y;
+getmaxyx(menu,x,y);
+werase(menu);
+mvwprintw(menu,x/2,0,"A Terminar");
+wrefresh(menu);
+sleep(5);
+
+chamar.flag=5;
+strcpy(chamar.titulo,dados.username);
+
+int fd_flag=open(PIPE_CHAMADA,O_WRONLY);
+write(fd_flag,&chamar,sizeof(atendercli));
+close(fd_flag);
+unlink(dados.nome_pipe_escrita);
+unlink(dados.nome_pipe_leitura);
+sair();
+
+
+ }
+
 
 void subscrever(){
   int m=0;
@@ -203,8 +227,10 @@ getmaxyx(menu,x,y);
   mvwprintw(menu,6,y/2-(strlen("CONSULTAR TITULOS-[Comando:OP2]"))/2,"CONSULTAR TITULOS-[Comando:OP2]");
   mvwprintw(menu,7,y/2-(strlen("CONSULTAR UMA MENSAGEM-[Comando:OP3]"))/2,"CONSULTAR UMA MENSAGEM-[Comando:OP3]");
   mvwprintw(menu,8,y/2-(strlen("SUBSCREVER/CANCELAR DE UM TOPIC-[Comando:OP4]"))/2,"SUBSCREVER/CANCELAR DE UM TOPIC-[Comando:OP4]");
+  mvwprintw(menu,9,y/2-(strlen("SAIR-[COMANDO:OP5]"))/2,"SAIR-[COMANDO:OP5]" );
 wrefresh(menu);
 }
+
 
 
 void iniciarncurses(){
@@ -276,6 +302,8 @@ do{
 int fd_cliente=open(dados.nome_pipe_leitura,O_RDONLY);
 
 n= read(fd_cliente,&dados,sizeof(cli_dados));
+pidServer= dados.pid;// na primeira conexão mandamos  pid do servidor para cá
+dados.pid = getpid();
 if(n!=-1){
 mvprintw(x/2+2,y/2-((strlen("O seu username:")+strlen(dados.username))/2),"O seu username:%s",dados.username);
 }
@@ -287,6 +315,8 @@ refresh();
 }
 //Variáveis globais
 int main(int argc, char** argv) {
+
+
 int m;
 int input1,input2;
 int tecla;
@@ -448,6 +478,10 @@ if(strcmp(comando,"OP4")==0){
 wrefresh(menu);
 lertopics();
 subscrever();
+
+}
+if(strcmp(comando,"OP5")==0){
+EncerraAplicacao();
 
 }
 if(strcmp(comando,"SAIR")==0){

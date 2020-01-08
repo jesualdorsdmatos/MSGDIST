@@ -1,3 +1,9 @@
 Falta fazer:
-    -> Imprimir para o stderr assim que o user é removido();
+    -> verificador não funciona codigo feito na função á parte.
+    -> situação dos números dos utilzadores;
+    -> Subscrições-> servidor comando prune falta avisar os clientes que estão com subscrições que o tópico deixou de existir
+    ->
 
+Notas:
+->No comando kick para mandar o cliente encerar foi usado o sigusr1, no cliente a msg depois aparece "servidor encerrou"
+->prints a dizer que foi adicionado ou removido fazem parte do projeto.

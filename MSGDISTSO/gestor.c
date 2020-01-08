@@ -2,7 +2,7 @@
 #include "geraldefinc.h"
     pthread_t lermensagem;
     pthread_t gestorc;
-
+varamb var;
     msg_cli *mensagem=NULL;
     cli_dados * clientes=NULL;
     subs *listatopics=NULL;
@@ -21,6 +21,15 @@ void atualizaident(){
 
         }
 
+}
+int verificaexisteTopico(char nome[]){
+int i=0;
+    for(i=0; i< nTopics; i++){
+    if (strcmp(nome,listatopics[i].topicos)==0){
+        return 0;
+        }
+    }
+return 1;
 }
     void imprimirin()
 {
@@ -44,6 +53,8 @@ void imprimirfi()
 void subsfunc(atendercli cli){
     utsub *temp;
     int res;
+res=verificaexisteTopico(cli.topico);
+if(res==0){
   if (subscricoes == NULL) {
   temp = (utsub*) malloc(sizeof(utsub) * 1);
       if(temp==NULL){
@@ -70,7 +81,8 @@ void subsfunc(atendercli cli){
                 nSubs++;
 
          }
-        }
+     }
+    }
 
 }
 void acrescentaMensagagem(msg_cli m){
@@ -105,7 +117,7 @@ void acrescentaMensagagem(msg_cli m){
          }
         }
         
-      fprintf(stderr,"Foi adicionada uma mensagem com o id %d\n",m.ident);   
+      fprintf(stderr,"\nFoi adicionada uma mensagem com o id %d\n",m.ident);   
 }
 
 void remove_spaces(char* s) {
@@ -132,6 +144,12 @@ void segementaNome(char username[] ,char * nome, char *numero){
     numero= realloc(numero, p*sizeof(char));
     }
     }
+    p++;
+    j++;
+    nome= realloc(nome,j* sizeof(char));
+    numero= realloc(numero, p*sizeof(char));
+nome[p]='\0';
+numero[p]='\0';
 
 }
 
@@ -139,66 +157,26 @@ bool verificaDadosCliente(cli_dados *c){
     int i=0,numat, num;
     int conta=0;
     int maior=0;
-    char *str;
+    char str[20];
+
     char *numero=(char*) malloc(sizeof(char));
     char *nome=(char*) malloc(sizeof(char));
    segementaNome(c->username,nome,numero);
+num= atoi(numero);
 
-       num= atoi(numero);
-   char *atualizanum;
-   char *atualizanome;
+
 for( int i; i< nUsers;i++){
-    printf("estou dentro do ciclo");
-atualizanum=(char*) malloc(sizeof(char));
-atualizanome=(char*) malloc(sizeof(char));
-
-   segementaNome(clientes[i].username,atualizanome,atualizanum);
-printf("nome %s", clientes[i].username);
-printf("intoduzido:%s",nome);
-    if( strcmp(nome,atualizanome)==0){// caso o nome seja o mesmo
-    printf("sao iguais");
-    conta ++;
-      numat= atoi(atualizanum);
-    if(maior < numat){
-        maior =numat;
-    }
-    }
-  
- free(atualizanome);
-free(atualizanum); 
-        }
-
-maior +=1;
-    str = malloc(strlen(nome)*sizeof(char));//+1* sizeof(char));
-     if(maior !=0 && conta !=0){
-         int l=0;
-        for(  l=0; l< strlen(nome); l++)
-        str[l] = nome[l];
-    
-        //str[l+1]=  maior;
-        for(int k=0; k< strlen(str); i++)
-        c->username[k] = str[k];
-  printf("maior-> %d   \n", maior);  
-        return true;
-    }
-free(str);
-     free(numero);
-    free(nome);
+sscanf(clientes[i].username,"strlen(nome)%s%d",str,&numat);
+printf("%d", numat);
+puts(str);
+}
 
 }
 
 
 
 
-int verificaexisteTopico(char nome[]){
-int i=0;
-    for(i=0; i< nTopics; i++){
-    if (strcmp(nome,listatopics[i].topicos)==0){
-        return 0;
-        }
-    }
-return 1;
-}
+
 
 
 
@@ -233,7 +211,7 @@ void acrescentartopic (msg_cli informacao){
 
          }
         }
-fprintf(stderr,"foi adicionado um novo topico com o nome %s",informacao.topico);
+fprintf(stderr,"\nfoi adicionado um novo topico com o nome %s",informacao.topico);
 }
 
 void acrescentaCliente (cli_dados c){
@@ -257,7 +235,7 @@ void acrescentaCliente (cli_dados c){
              nUsers++;
          }
         }
-    fprintf(stderr, "Foi adicionado um cliente  com o nome %s", c.username);
+    fprintf(stderr, "\nFoi adicionado um cliente  com o nome %s", c.username);
 
 }
 
@@ -332,7 +310,6 @@ void help()
     printf("Comando:Topic -> Argumento [topico-em-questao], lista mensagens do topico.\n");
     printf("Comando:Del -> Argumento [mensagem-em-questao], Apagar mensagem.\n");
     printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
-    printf("Comando:Kick -> Argumento [username-em-questao], Excluir um utilizador.\n");
     printf("Comando:Prune -> Eliminar Topicos sem conteudo.\n");
 }
 int verificaUnicoTopico(char topico[]){
@@ -351,11 +328,11 @@ void removetopico(char topico[]){
 
     subs *temp = malloc((nTopics - 1) * sizeof(subs)); // allocate an array with a size 1 less than the current one
 
-    if (ind != 0)
-        memcpy(temp, listatopics, ind * sizeof(subs)); // copy everything BEFORE the index
+    if (i != 0)
+        memcpy(temp, listatopics, i * sizeof(subs)); // copy everything BEFORE the index
 
-    if (ind != (nTopics - 1))
-        memcpy(temp+ind, listatopics+ind+1, (nTopics - ind - 1) * sizeof(subs)); // copy everything AFTER the index
+    if (i!= (nTopics - 1))
+        memcpy(temp+i, listatopics+i+1, (nTopics - i - 1) * sizeof(subs)); // copy everything AFTER the index
 
     listatopics= temp;
     nTopics--;
@@ -364,7 +341,39 @@ void removetopico(char topico[]){
 
         }
     }
-fprintf(stderr, "Foi removido um topico com o nome %s\n", topico);
+fprintf(stderr, "\nFoi removido um topico com o nome %s\n", topico);
+
+}
+//utilziada no comadno kick remove utilizador e envia sinal ao cliente para terminar 
+void removeUtilizador( char nome[]){
+int ind=0;
+int i=0;
+char str[strlen(nome)];
+for( i=0; i<strlen(nome);i++){
+    str[i]= tolower( nome[i]);
+}
+str[i]='\0';;
+    for( i=0; i< nUsers; i++){
+        if(strcmp(clientes[i].username, str)==0){
+            kill(clientes[i].pid,SIGUSR1);
+            
+    cli_dados *temp = malloc((nUsers - 1) * sizeof(cli_dados)); // allocate an array with a size 1 less than the current one
+
+    if (i != 0)
+        memcpy(temp, clientes, i * sizeof(cli_dados)); // copy everything BEFORE the index
+
+    if (i != (nUsers - 1))
+        memcpy(temp+i, clientes+i+1, (nUsers - i - 1) * sizeof(cli_dados)); // copy everything AFTER the index
+
+    clientes= temp;
+    nUsers--;
+    free(temp);
+
+        }
+    }
+
+fprintf(stderr, "\nFoi removido um Cliente com o nome %s\n", nome);
+
 
 }
 void removeMensagem( int id){
@@ -385,7 +394,7 @@ void removeMensagem( int id){
     nMensagem--;
         }
     }
-    fprintf(stderr, "Foi removida uma mensagem com o id %d\n", id);
+    fprintf(stderr, "\nFoi removida uma mensagem com o id %d\n", id);
 
 }
 
@@ -407,12 +416,15 @@ void * recebermensagens(void * nomepipe){
 int res=0;
 
     do{
+       
       int fd_cliente=open(nomepipe,O_RDONLY);
       msg_cli m;
        int n=read(fd_cliente,&m,sizeof(msg_cli));
         if(n!=-1){
+             if(nMensagem < var.MAXMSG ){// se ainda ouver espaço
            
                acrescentaMensagagem(m);
+
         pthread_t t_msg;        
      
      int res = pthread_create( &t_msg, NULL, DecrementaTempo, (void*) &mensagem[nMensagem-1]);
@@ -420,7 +432,9 @@ int res=0;
 if(res!=0){
     printf("Erro a  lancar a thread para mensagem com o titulo %s", m.titulo);
         }
+        }
          }
+         
 
    }while(1);
 }
@@ -430,9 +444,10 @@ void * recebelogins(){
      cli_dados c;
       int fd_serv=open(SERV_PIPE,O_RDONLY);
    read(fd_serv,&c,sizeof(cli_dados));
-//verificaDadosCliente(&c); 
 
    acrescentaCliente(c);
+   verificaDadosCliente(&c); 
+
    if(c.estado!=1){
     if(mkfifo(c.nome_pipe_leitura,0600)==-1){
         printf("ERRO NA CRIACAO DO PIPE CLIENTE %s",c.nome_pipe_leitura);
@@ -443,6 +458,7 @@ void * recebelogins(){
        int fd_cliente=open(c.nome_pipe_leitura,O_WRONLY);
     c.estado=1;
     close(fd_serv);
+    c.pid=getpid();
     write(fd_cliente,&c,sizeof(cli_dados));
     close(fd_cliente);  
      int res_uti = pthread_create( &lermensagem, NULL, recebermensagens,(void*)&c.nome_pipe_leitura);  
@@ -511,7 +527,12 @@ fflush(stdout);
 
         if(atender.flag==4){
           subsfunc(atender);  
+
           printf("topic subscrito foi %s \n pelo %s\n",subscricoes[0].topicos,subscricoes[0].nome_pipe_escrita);
+        }
+        if (atender.flag==5){// sai é enviado no lugar do titulo o username
+            removeUtilizador(atender.titulo);
+
         }
          
         atender.flag=0;
@@ -523,16 +544,36 @@ for (int i=0; i< nUsers;i++){
     printf("Nome: %s\n",clientes[i].username);
 }
 }
+void removesubscricao( int id){ 
+
+    utsub *temp = malloc((nSubs - 1) * sizeof(utsub)); // allocate an array with a size 1 less than the current one
+
+    if (id != 0)
+        memcpy(temp,subscricoes, id * sizeof(utsub)); // copy everything BEFORE the index
+
+    if (id != (nSubs - 1))
+        memcpy(temp+id, subscricoes+id+1, (nSubs - id - 1) * sizeof(utsub)); // copy everything AFTER the index
+
+    subscricoes= temp;
+    nSubs--;
+}
+
+
 void cmdPrune(){
-int unico=0;
+int unico=0,j=0;
 for(int i=0; i<nMensagem; i++){
    unico = verificaUnicoTopico(mensagem[i].topico);
 
        if(unico==1){
+           for(int i=0;i<nSubs; i++){
+               if(subscricoes[i].topicos==mensagem[i].topico){
+                   removesubscricao(j);
+               }
+           }
         removetopico(mensagem[i].topico);
     }
-     
 }
+
 
 }
 void listamensagens(){
@@ -566,7 +607,35 @@ for(i=0; i<nMensagem;i++){
     }
 
 }
+void  verificamsg(){
+char buffer[3];
+int numerx;
+     char pal[]="jesualdo manuel maria ";
+     filtro=1;
+     printf("%s",pal);
+                if (filtro == 1)
+                {
+                    close(pipe1[READ]);
+                    close(pipe2[WRITE]);
+                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
+                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
 
+                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
+                        fprintf(stderr, "[ERRO] Envio do \\n \n");
+
+                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
+                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
+
+                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
+                    if (nbytes == -1)
+                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
+                    else
+                        numerx = atoi(buffer);
+                    
+
+                    printf("Numero de palavras invalidas:%d\n", numerx);
+                }
+}
 
 
 
@@ -574,13 +643,12 @@ int main(int argc, char *argv)
 {
     char cmd[50], pal[200];
     cmds b;
-    b.argumento = NULL;   
-   
+    b.argumento = NULL;     
     int pidfilho = 0;
     int restfork;
   
     imprimirin();
-    varamb var = lervarambiente();
+  var = lervarambiente();
    if(access(SERV_PIPE,F_OK)){
          if(mkfifo(SERV_PIPE,0600)==-1){
             perror("[ERRO]na Criação do pipe do servidor.\n");
@@ -601,8 +669,7 @@ int main(int argc, char *argv)
     }
     pthread_t tlogin;
 
-    int res_login = pthread_create( &tlogin, NULL, recebelogins, NULL);
-
+ 
     
    
 if (pipe(pipe1) == -1)
@@ -628,10 +695,7 @@ if (pipe(pipe1) == -1)
     }
     else
     {
-          // int res=filtramensagem("a maria tem de colocar isto a dar");
-            //  printf("%d",res);
-char buffer[3];
-int numerx;
+             int res_login = pthread_create( &tlogin, NULL, recebelogins, NULL);
         pidfilho = restfork;
         while (1)
         {
@@ -640,6 +704,7 @@ int numerx;
             fflush(stdin);
             removerespaco(cmd);
             int i;
+        
             for ( i = 0; i < strlen(cmd); i++)
                 cmd[i] = toupper(cmd[i]);
 
@@ -664,32 +729,7 @@ int numerx;
                 }
                 else
                     printf("[ERRO] Argumento:%s invalido.\nArgumento:ON/OFF\n", b.argumento);
-            }else if (strcmp(b.comando, "MENSAGEM") == 0)
-            {
-           
-                if (filtro == 1)
-                {
-                    close(pipe1[READ]);
-                    close(pipe2[WRITE]);
-                    if (write(pipe1[WRITE], pal, strlen(pal)) != strlen(pal))
-                        fprintf(stderr, "[ERRO] Envio da mensagem!\n");
-
-                    if (write(pipe1[WRITE], "\n", strlen("\n")) != strlen("\n"))
-                        fprintf(stderr, "[ERRO] Envio do \\n \n");
-
-                    if (write(pipe1[WRITE], "##MSGEND##\n", strlen("##MSGEND##\n")) != strlen("##MSGEND##\n"))
-                        fprintf(stderr, "[ERRO] Envio do (##MSGEND##)\n");
-
-                    int nbytes = read(pipe2[READ], buffer, strlen(buffer));
-                    if (nbytes == errno)
-                        fprintf(stderr, "[ERRO] A Ler do pipe2\n");
-                    else
-                        numerx = atoi(buffer);
-
-                    printf("Numero de palavras invalidas:%d\n", numerx);
-                }
             }
-            
             else if (strcmp(b.comando, "USERS") == 0)
             {
                 printf("\nUtilizadores EXISTENTES:\n");
@@ -734,6 +774,7 @@ int numerx;
             }
             else if (strcmp(b.comando, "KICK") == 0 && b.argumento != NULL)
             {
+            removeUtilizador(b.argumento);
 
             }
             else if (strcmp(b.comando, "PRUNE") == 0)
