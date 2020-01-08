@@ -21,6 +21,7 @@ char topicos[MAX_TOPIC];
 typedef struct util_subsc{
 char topicos[MAX_TOPIC];
  char nome_pipe_escrita[MAX_USER];
+    int ident;
 }utsub;
 // Estruturas para os comandos.
 typedef struct cmdguardar{

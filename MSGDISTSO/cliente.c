@@ -6,7 +6,7 @@
 #include <string.h>
 char comando[20];
 cli_dados dados;
-msg_cli msg,tudo;
+msg_cli msg,tudo,suba;
 subs lista;
 int linha=1,coluna=0;
 atendercli chamar;
@@ -16,7 +16,14 @@ int pidServer;
 
 
 /*********************/
+void avisar(){
+ 
+    int x,y;
+getmaxyx(menu,x,y);
+mvwprintw(menu,x-2,0,"recebeu nova mensagem do topic subscrito!");
+wrefresh(menu);
 
+}
 
 void sinall(int s){
   int x,y;
@@ -70,6 +77,7 @@ wrefresh(comandos);
 chamar.flag=4;
 strcpy(chamar.topico,comando);
 strcpy(chamar.nome_pipe_escrita,dados.nome_pipe_escrita);
+chamar.ident=dados.pid;
 int fd_flag=open(PIPE_CHAMADA,O_WRONLY);
 write(fd_flag,&chamar,sizeof(atendercli));
 close(fd_flag);
@@ -227,7 +235,9 @@ getmaxyx(menu,x,y);
   mvwprintw(menu,6,y/2-(strlen("CONSULTAR TITULOS-[Comando:OP2]"))/2,"CONSULTAR TITULOS-[Comando:OP2]");
   mvwprintw(menu,7,y/2-(strlen("CONSULTAR UMA MENSAGEM-[Comando:OP3]"))/2,"CONSULTAR UMA MENSAGEM-[Comando:OP3]");
   mvwprintw(menu,8,y/2-(strlen("SUBSCREVER/CANCELAR DE UM TOPIC-[Comando:OP4]"))/2,"SUBSCREVER/CANCELAR DE UM TOPIC-[Comando:OP4]");
-  mvwprintw(menu,9,y/2-(strlen("SAIR-[COMANDO:OP5]"))/2,"SAIR-[COMANDO:OP5]" );
+  mvwprintw(menu,9,y/2-(strlen("VOLTAR ATRAS-[COMANDO:SAIR]"))/2,"VOLTAR ATRAS-[COMANDO:SAIR]" );
+  mvwprintw(menu,10,y/2-(strlen("SHUTDOWN-[COMANDO:OP5]"))/2,"SHUTDOWN-[COMANDO:OP5]" );
+
 wrefresh(menu);
 }
 
@@ -322,6 +332,7 @@ int input1,input2;
 int tecla;
 
 signal(SIGUSR1,sinall);
+signal(SIGINT,avisar);
 
 
  if(access(SERV_PIPE,F_OK)!=0){
@@ -496,9 +507,8 @@ if(strcmp(comando,"SAIR")==0){
   wrefresh(mensagem);
 
 
+
 }
-
-
 }
 
 if(linha==x-2)

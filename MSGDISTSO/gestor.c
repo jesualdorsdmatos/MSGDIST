@@ -53,7 +53,7 @@ void imprimirfi()
 void subsfunc(atendercli cli){
     utsub *temp;
     int res;
-res=verificaexisteTopico(cli.topico);
+//res=verificaexisteTopico(cli.topico);
 if(res==0){
   if (subscricoes == NULL) {
   temp = (utsub*) malloc(sizeof(utsub) * 1);
@@ -62,9 +62,8 @@ if(res==0){
              }else{
             subscricoes = temp;     
         
-            strcpy(subscricoes[nSubs].nome_pipe_escrita,cli.nome_pipe_escrita);
-                        strcpy(subscricoes[nSubs].topicos,cli.topico);
-
+            subscricoes[nSubs].ident=cli.ident;
+            strcpy(subscricoes[nSubs].topicos,cli.topico);
            nSubs++;
 
           
@@ -77,13 +76,13 @@ if(res==0){
              subscricoes=temp;
             
                   strcpy(subscricoes[nSubs].nome_pipe_escrita,cli.nome_pipe_escrita);
-                        strcpy(subscricoes[nSubs].topicos,cli.topico);
+                  strcpy(subscricoes[nSubs].topicos,cli.topico);
+
                 nSubs++;
 
          }
      }
-    }
-
+   }                            
 }
 void acrescentaMensagagem(msg_cli m){
     msg_cli *temp;
@@ -413,8 +412,9 @@ void * DecrementaTempo(void * ms){
 }
 
 void * recebermensagens(void * nomepipe){
-int res=0;
-
+int res=0,r=0;
+int i;
+int fd_enviar;
     do{
        
       int fd_cliente=open(nomepipe,O_RDONLY);
@@ -424,7 +424,14 @@ int res=0;
              if(nMensagem < var.MAXMSG ){// se ainda ouver espaço
            
                acrescentaMensagagem(m);
-
+                for(i=0;i<nSubs;i++){
+                    for ( r = 0; r < strlen(m.topico); r++)
+                m.topico[r] = toupper(m.topico[r]);
+                    if(strcmp(subscricoes[i].topicos,m.topico)==0){
+                        kill(subscricoes[i].ident,SIGINT);
+                    }
+                }
+             }
         pthread_t t_msg;        
      
      int res = pthread_create( &t_msg, NULL, DecrementaTempo, (void*) &mensagem[nMensagem-1]);
@@ -433,7 +440,7 @@ if(res!=0){
     printf("Erro a  lancar a thread para mensagem com o titulo %s", m.titulo);
         }
         }
-         }
+         
          
 
    }while(1);
@@ -537,8 +544,8 @@ fflush(stdout);
          
         atender.flag=0;
 }while(1);
-
 }
+
 void listautilizadores(){
 for (int i=0; i< nUsers;i++){
     printf("Nome: %s\n",clientes[i].username);

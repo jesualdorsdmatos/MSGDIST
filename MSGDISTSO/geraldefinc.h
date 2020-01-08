@@ -61,6 +61,7 @@ typedef struct atender{
     char nome_pipe_escrita[MAX_USER];
     char titulo[MAX_TITULO];
     char topico[MAX_TOPIC];
+       int ident;
 }atendercli;
 
 #endif /* GERALDEFINC_H */

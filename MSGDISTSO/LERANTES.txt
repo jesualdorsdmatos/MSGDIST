@@ -1,6 +1,5 @@
 Falta fazer:
-    -> verificador não funciona codigo feito na função á parte.
-    -> situação dos números dos utilzadores;
+    -> verificador não funciona codigo feito na função á parte. 
     -> Subscrições-> servidor comando prune falta avisar os clientes que estão com subscrições que o tópico deixou de existir
     ->
 
